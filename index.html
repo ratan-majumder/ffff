@@ -1,0 +1,1651 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kaliaff Restaurant - Deshi & Bideshi Food</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #c0392b;
+  --primary-dark: #922b21;
+  --primary-light: #e74c3c;
+  --gold: #f39c12;
+  --gold-light: #f8c471;
+  --dark: #1a0a00;
+  --dark2: #2c1810;
+  --light: #fff8f0;
+  --text: #3d1f0d;
+  --text-light: #7a4f3a;
+  --white: #ffffff;
+  --shadow: 0 8px 32px rgba(192,57,43,0.15);
+  --shadow-lg: 0 20px 60px rgba(26,10,0,0.25);
+  --radius: 16px;
+  --radius-sm: 8px;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+body { font-family: 'Hind Siliguri', sans-serif; background: var(--light); color: var(--text); min-height: 100vh; }
+
+/* ===== NAVBAR ===== */
+nav {
+  position: fixed; top:0; left:0; right:0; z-index:1000;
+  background: rgba(26,10,0,0.97);
+  backdrop-filter: blur(20px);
+  padding: 0 16px;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 60px;
+  border-bottom: 2px solid var(--gold);
+}
+.nav-logo { display: flex; align-items: center; gap: 10px; text-decoration:none; }
+.nav-logo img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid var(--gold); }
+.nav-logo-text { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 900; color: var(--gold); }
+.nav-logo-sub { font-size: 0.6rem; color: #aaa; display: block; margin-top: -3px; }
+.nav-links { display: flex; gap: 16px; align-items: center; }
+.nav-links a { color: #ddd; text-decoration: none; font-size: 0.85rem; transition: color 0.2s; }
+.nav-links a:hover { color: var(--gold); }
+.nav-right { display: flex; align-items: center; gap: 10px; }
+.cart-btn {
+  background: var(--primary); color: white;
+  border: none; border-radius: 20px;
+  padding: 7px 14px; cursor: pointer;
+  font-family: inherit; font-size: 0.85rem;
+  display: flex; align-items: center; gap: 6px;
+  transition: background 0.2s;
+}
+.cart-btn:hover { background: var(--primary-dark); }
+.cart-count {
+  background: var(--gold); color: var(--dark);
+  border-radius: 50%; width: 20px; height: 20px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.72rem; font-weight: 700;
+}
+
+/* ===== NOTICE BOARD ===== */
+.notice-board {
+  margin-top: 60px;
+  background: linear-gradient(90deg, #922b21, #c0392b, #f39c12);
+  padding: 0;
+  overflow: hidden;
+  display: none;
+}
+.notice-board.has-notices { display: block; }
+.notice-ticker {
+  display: flex; align-items: center;
+  padding: 9px 16px; gap: 12px;
+}
+.notice-label {
+  background: rgba(0,0,0,0.3); color: white;
+  padding: 3px 10px; border-radius: 12px;
+  font-size: 0.72rem; font-weight: 700;
+  white-space: nowrap; flex-shrink: 0;
+}
+.notice-scroll-wrap { flex:1; overflow: hidden; }
+.notice-scroll {
+  display: flex; gap: 40px;
+  animation: ticker 20s linear infinite;
+  white-space: nowrap;
+}
+.notice-scroll:hover { animation-play-state: paused; }
+.notice-item {
+  color: white; font-size: 0.85rem; font-weight: 500;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+@keyframes ticker { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+
+/* ===== BANNER ===== */
+.banner-section {
+  position: relative; overflow: hidden;
+  background: var(--dark);
+}
+.banner-slider { position: relative; }
+.banner-slide {
+  display: none;
+  width: 100%; min-height: 260px;
+  background: linear-gradient(135deg, var(--dark2), var(--primary-dark));
+  position: relative; overflow: hidden;
+}
+.banner-slide.active { display: flex; align-items: center; }
+.banner-content { padding: 32px 20px; z-index: 2; position: relative; max-width: 60%; }
+.banner-badge {
+  background: var(--gold); color: var(--dark);
+  font-size: 0.72rem; font-weight: 700;
+  padding: 4px 12px; border-radius: 20px;
+  display: inline-block; margin-bottom: 10px;
+  animation: pulse 2s infinite;
+}
+@keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.05)} }
+.banner-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.4rem, 4.5vw, 2.5rem);
+  color: white; line-height: 1.2; margin-bottom: 8px;
+}
+.banner-sub { color: #ddd; font-size: 0.9rem; margin-bottom: 16px; }
+.banner-btns { display:flex; gap:8px; flex-wrap:wrap; }
+.banner-cta {
+  background: var(--gold); color: var(--dark);
+  border: none; border-radius: 25px;
+  padding: 9px 20px; font-size: 0.9rem; font-weight: 700;
+  cursor: pointer; font-family: inherit;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.banner-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(243,156,18,0.4); }
+.banner-link-btn {
+  background: rgba(255,255,255,0.15); color: white;
+  border: 1.5px solid rgba(255,255,255,0.4); border-radius: 25px;
+  padding: 9px 16px; font-size: 0.85rem;
+  cursor: pointer; font-family: inherit;
+  transition: background 0.2s; text-decoration:none;
+  display:inline-flex; align-items:center; gap:4px;
+}
+.banner-link-btn:hover { background: rgba(255,255,255,0.25); }
+.banner-deco { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-size: 110px; opacity: 0.13; }
+.banner-img { position:absolute; right:0; top:0; height:100%; width:45%; object-fit:cover; opacity:0.35; }
+.banner-dots {
+  position: absolute; bottom: 10px; left: 50%;
+  transform: translateX(-50%);
+  display: flex; gap: 6px; z-index: 3;
+}
+.banner-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: rgba(255,255,255,0.4); cursor: pointer; border: none;
+  transition: background 0.2s, width 0.2s;
+}
+.banner-dot.active { background: var(--gold); width: 18px; border-radius: 4px; }
+
+/* ===== SECTION ===== */
+.section { padding: 28px 16px; max-width: 1100px; margin: 0 auto; }
+.section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+.section-title { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--dark); }
+.section-title span { color: var(--primary); }
+.section-line { height: 3px; width: 45px; background: linear-gradient(90deg, var(--primary), var(--gold)); border-radius: 2px; margin-top: 5px; }
+
+/* ===== FOOD GRID ===== */
+.food-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+  gap: 14px;
+  padding: 0 16px;
+  max-width: 1100px; margin: 0 auto;
+}
+@media(min-width:480px) { .food-grid { grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); } }
+@media(min-width:640px) { .food-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); } }
+
+.food-card {
+  background: white; border-radius: var(--radius);
+  overflow: hidden; box-shadow: 0 3px 12px rgba(0,0,0,0.07);
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer; position: relative;
+}
+.food-card:hover { transform: translateY(-4px); box-shadow: var(--shadow); }
+.food-img-wrap { position: relative; width: 100%; padding-top: 68%; overflow: hidden; }
+.food-img-wrap img {
+  position: absolute; top:0; left:0; width:100%; height:100%;
+  object-fit: cover; transition: transform 0.3s;
+}
+.food-card:hover .food-img-wrap img { transform: scale(1.06); }
+.food-badge-discount {
+  position: absolute; top: 7px; left: 7px;
+  background: var(--primary); color: white;
+  font-size: 0.68rem; font-weight: 700;
+  padding: 3px 7px; border-radius: 9px;
+}
+.food-badge-tag {
+  position: absolute; top: 7px; right: 7px;
+  background: var(--gold); color: var(--dark);
+  font-size: 0.63rem; font-weight: 700;
+  padding: 3px 7px; border-radius: 9px;
+}
+.food-share-btn {
+  position: absolute; bottom: 7px; right: 7px;
+  background: rgba(255,255,255,0.9); border:none;
+  border-radius:50%; width:26px; height:26px;
+  display:flex; align-items:center; justify-content:center;
+  font-size: 0.8rem; cursor: pointer; z-index:2;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  transition: transform 0.2s;
+}
+.food-share-btn:hover { transform: scale(1.1); }
+.food-info { padding: 10px; }
+.food-name { font-weight: 600; font-size: 0.9rem; margin-bottom: 3px; line-height: 1.3; }
+.food-desc { font-size: 0.72rem; color: var(--text-light); margin-bottom: 7px; line-height: 1.4; }
+.food-price-row { display: flex; align-items: center; justify-content: space-between; }
+.food-price { font-weight: 700; font-size: 1rem; color: var(--primary); }
+.food-old-price { font-size: 0.73rem; color: #aaa; text-decoration: line-through; margin-left: 3px; }
+.food-add-btn {
+  background: var(--primary); color: white;
+  border: none; border-radius: 50%;
+  width: 28px; height: 28px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem; cursor: pointer;
+  transition: background 0.2s;
+}
+.food-add-btn:hover { background: var(--primary-dark); }
+
+/* ===== CART DRAWER ===== */
+.cart-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 2000; }
+.cart-overlay.open { display: block; }
+.cart-drawer {
+  position: fixed; right: 0; top: 0; bottom: 0;
+  width: min(380px, 100vw);
+  background: white; z-index: 2001;
+  display: flex; flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+  box-shadow: var(--shadow-lg);
+}
+.cart-drawer.open { transform: translateX(0); }
+.cart-header { padding: 18px; background: var(--dark); display: flex; align-items: center; justify-content: space-between; }
+.cart-header h3 { color: white; font-family: 'Playfair Display', serif; font-size:1.1rem; }
+.cart-close { background: none; border: none; color: var(--gold); font-size: 1.4rem; cursor: pointer; }
+.cart-items { flex:1; overflow-y: auto; padding: 14px; }
+.cart-item {
+  display: flex; gap: 10px; align-items: center;
+  padding: 10px; background: var(--light);
+  border-radius: var(--radius-sm); margin-bottom: 8px;
+}
+.cart-item img { width: 52px; height: 52px; border-radius: 8px; object-fit: cover; }
+.cart-item-info { flex: 1; }
+.cart-item-name { font-weight: 600; font-size: 0.88rem; }
+.cart-item-variant { font-size: 0.72rem; color: var(--text-light); }
+.cart-item-price { font-weight: 700; color: var(--primary); font-size: 0.88rem; }
+.cart-qty { display: flex; align-items: center; gap: 7px; margin-top: 4px; }
+.qty-btn {
+  width: 22px; height: 22px; border-radius: 50%;
+  border: 1.5px solid var(--primary); background: white;
+  color: var(--primary); font-size: 0.9rem;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+}
+.qty-num { font-weight: 700; font-size: 0.88rem; }
+.cart-footer { padding: 14px; border-top: 2px solid #eee; }
+.cart-total-row { display: flex; justify-content: space-between; margin-bottom: 5px; }
+.cart-total-label { color: var(--text-light); font-size:0.9rem; }
+.cart-total-value { font-weight: 700; font-size:0.9rem; }
+.cart-grand { font-size: 1rem; color: var(--primary); font-weight:700; }
+.cart-checkout-btn {
+  width: 100%; padding: 13px;
+  background: var(--primary); color: white;
+  border: none; border-radius: var(--radius);
+  font-family: inherit; font-size: 0.95rem; font-weight: 700;
+  cursor: pointer; margin-top: 10px; transition: background 0.2s;
+}
+.cart-checkout-btn:hover { background: var(--primary-dark); }
+.wa-order-btn {
+  width: 100%; padding: 11px;
+  background: #25D366; color: white;
+  border: none; border-radius: var(--radius);
+  font-family: inherit; font-size: 0.9rem; font-weight: 600;
+  cursor: pointer; margin-top: 7px;
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  transition: background 0.2s;
+}
+.wa-order-btn:hover { background: #128C7E; }
+
+/* ===== FOOD DETAIL MODAL ===== */
+.modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.6); z-index: 3000;
+  align-items: flex-end; justify-content: center;
+}
+.modal-overlay.open { display: flex; }
+.food-modal {
+  background: white; width: min(480px, 100vw);
+  border-radius: 22px 22px 0 0;
+  max-height: 90vh; overflow-y: auto;
+  animation: slideUp 0.3s ease;
+}
+@keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+.modal-img { width: 100%; height: 210px; object-fit: cover; }
+.modal-body { padding: 18px; }
+.modal-name { font-family: 'Playfair Display', serif; font-size: 1.35rem; margin-bottom: 6px; }
+.modal-desc { color: var(--text-light); line-height: 1.6; margin-bottom: 14px; font-size:0.9rem; }
+.variant-label { font-weight: 600; margin-bottom: 7px; font-size: 0.88rem; }
+.variants { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 14px; }
+.variant-btn {
+  padding: 5px 13px; border-radius: 20px;
+  border: 2px solid #ddd; background: white;
+  font-family: inherit; font-size: 0.83rem; cursor: pointer; transition: all 0.2s;
+}
+.variant-btn.active { border-color: var(--primary); color: var(--primary); background: #fff5f4; }
+.modal-price-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.modal-price { font-size: 1.35rem; font-weight: 700; color: var(--primary); }
+.modal-old-price { font-size: 0.88rem; color: #aaa; text-decoration: line-through; }
+.modal-action-row { display:flex; gap:8px; }
+.modal-share-btn {
+  padding: 13px 16px; border-radius: var(--radius);
+  background: #f5f5f5; border:none; cursor:pointer;
+  font-size:1.1rem; transition: background 0.2s;
+}
+.modal-share-btn:hover { background: #e8e8e8; }
+.modal-add-btn {
+  flex:1; padding: 13px;
+  background: var(--primary); color: white;
+  border: none; border-radius: var(--radius);
+  font-family: inherit; font-size: 0.95rem; font-weight: 700;
+  cursor: pointer; transition: background 0.2s;
+}
+.modal-add-btn:hover { background: var(--primary-dark); }
+.modal-close-btn {
+  position: absolute; top: 10px; right: 10px;
+  background: rgba(0,0,0,0.5); border: none; color: white;
+  border-radius: 50%; width: 34px; height: 34px;
+  font-size: 1.1rem; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* ===== CHECKOUT MODAL ===== */
+.checkout-modal {
+  background: white; width: min(480px, 100vw);
+  border-radius: 22px 22px 0 0;
+  max-height: 92vh; overflow-y: auto;
+  animation: slideUp 0.3s ease;
+}
+.checkout-header { padding: 18px; border-bottom: 1px solid #eee; }
+.checkout-header h3 { font-family: 'Playfair Display', serif; font-size: 1.2rem; }
+.checkout-body { padding: 18px; }
+.form-group { margin-bottom: 14px; }
+.form-label { font-weight: 600; font-size: 0.88rem; margin-bottom: 5px; display: block; }
+.form-input {
+  width: 100%; padding: 11px;
+  border: 2px solid #eee; border-radius: var(--radius-sm);
+  font-family: inherit; font-size: 0.92rem; outline: none;
+  transition: border-color 0.2s;
+}
+.form-input:focus { border-color: var(--primary); }
+.form-textarea { min-height: 75px; resize: vertical; }
+.payment-options { display: flex; flex-direction: column; gap: 7px; }
+.payment-opt {
+  padding: 11px 14px; border-radius: var(--radius-sm);
+  border: 2px solid #eee; cursor: pointer;
+  display: flex; align-items: center; gap: 9px; transition: all 0.2s;
+}
+.payment-opt.selected { border-color: var(--primary); background: #fff5f4; }
+.payment-opt input { accent-color: var(--primary); }
+.payment-opt-label { font-weight: 600; font-size: 0.88rem; }
+.payment-opt-sub { font-size: 0.73rem; color: var(--text-light); }
+.payment-numbers { background: #f8f9fa; border-radius: var(--radius-sm); padding: 11px; margin-top: 7px; }
+.pay-num-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+.pay-num-label { font-size: 0.83rem; color: var(--text-light); }
+.pay-num-value { font-weight: 700; font-size: 0.92rem; }
+.trx-upload { border: 2px dashed #ddd; border-radius: var(--radius-sm); padding: 14px; text-align: center; cursor: pointer; }
+.trx-upload:hover { border-color: var(--primary); }
+.place-order-btn {
+  width: 100%; padding: 13px;
+  background: var(--primary); color: white;
+  border: none; border-radius: var(--radius);
+  font-family: inherit; font-size: 0.95rem; font-weight: 700;
+  cursor: pointer; transition: background 0.2s;
+}
+.place-order-btn:hover { background: var(--primary-dark); }
+
+/* ===== ORDER STATUS ===== */
+.order-card {
+  background: white; border-radius: var(--radius);
+  box-shadow: var(--shadow); overflow: hidden; margin-bottom: 14px;
+}
+.order-card-header {
+  padding: 13px 14px; background: var(--dark); color: white;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.order-id { font-family: 'Playfair Display', serif; font-size: 0.95rem; }
+.order-status-badge { padding: 3px 11px; border-radius: 11px; font-size: 0.72rem; font-weight: 700; }
+.status-pending { background: #ffeaa7; color: #d35400; }
+.status-confirmed { background: #dfe6e9; color: #2d3436; }
+.status-shipping { background: #74b9ff; color: #0984e3; }
+.status-delivered { background: #55efc4; color: #00b894; }
+.order-timeline { padding: 14px; display: flex; gap: 0; }
+.timeline-step { flex: 1; text-align: center; position: relative; }
+.timeline-step::after {
+  content: ''; position: absolute;
+  top: 12px; left: 50%; right: -50%;
+  height: 2px; background: #eee; z-index: 0;
+}
+.timeline-step:last-child::after { display: none; }
+.timeline-icon {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: #eee; display: flex; align-items: center; justify-content: center;
+  font-size: 0.8rem; margin: 0 auto 5px; position: relative; z-index: 1;
+}
+.timeline-step.done .timeline-icon { background: var(--primary); color: white; }
+.timeline-step.done::after { background: var(--primary); }
+.timeline-label { font-size: 0.62rem; color: var(--text-light); }
+
+/* ===== LOCATION SECTION ===== */
+.location-section {
+  padding: 20px 16px;
+  max-width: 1100px; margin: 0 auto;
+}
+.location-card {
+  background: white; border-radius: var(--radius);
+  padding: 18px; box-shadow: 0 3px 12px rgba(0,0,0,0.07);
+  display: flex; align-items: center; gap: 16px;
+}
+.location-icon { font-size: 2.5rem; flex-shrink: 0; }
+.location-info { flex:1; }
+.location-name { font-weight: 700; font-size: 1rem; margin-bottom: 3px; }
+.location-address { font-size: 0.83rem; color: var(--text-light); }
+.location-btn {
+  background: var(--primary); color: white;
+  border: none; border-radius: 20px; padding: 9px 16px;
+  font-family: inherit; font-size: 0.83rem; font-weight: 700;
+  cursor: pointer; text-decoration:none; display:inline-block;
+  transition: background 0.2s; flex-shrink:0;
+}
+.location-btn:hover { background: var(--primary-dark); }
+
+/* ===== LIVE CHAT ===== */
+.live-chat-btn {
+  position: fixed; bottom: 20px; right: 20px; z-index: 500;
+  width: 54px; height: 54px; border-radius: 50%;
+  background: var(--primary); color: white;
+  border: none; font-size: 1.3rem; cursor: pointer;
+  box-shadow: 0 4px 16px rgba(192,57,43,0.4);
+  display: flex; align-items: center; justify-content: center;
+  transition: transform 0.2s;
+}
+.live-chat-btn:hover { transform: scale(1.1); }
+.chat-notif-dot {
+  position: absolute; top: -2px; right: -2px;
+  width: 14px; height: 14px; border-radius: 50%;
+  background: var(--gold); border: 2px solid white;
+  display: none;
+}
+.chat-notif-dot.show { display: block; }
+.chat-window {
+  position: fixed; bottom: 84px; right: 16px; z-index: 500;
+  width: min(320px, calc(100vw - 32px)); background: white; border-radius: var(--radius);
+  box-shadow: var(--shadow-lg); display: none; flex-direction: column;
+  overflow: hidden; max-height: 420px;
+}
+.chat-window.open { display: flex; }
+.chat-win-header {
+  background: var(--dark); color: white;
+  padding: 12px 14px; display: flex; justify-content: space-between; align-items: center;
+}
+.chat-win-title { font-weight: 600; font-size:0.9rem; }
+.chat-win-status { font-size:0.7rem; color: #55efc4; }
+.chat-messages { flex:1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 7px; }
+.chat-msg {
+  max-width: 82%; padding: 8px 11px;
+  border-radius: 12px; font-size: 0.83rem; line-height: 1.4;
+}
+.chat-msg.bot { background: var(--light); align-self: flex-start; border-bottom-left-radius: 2px; }
+.chat-msg.user { background: var(--primary); color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
+.chat-msg.admin-reply { background: #1a0a00; color: #f8c471; align-self: flex-start; border-bottom-left-radius: 2px; }
+.chat-typing { display:none; font-size:0.75rem; color:#aaa; padding:4px 10px; }
+.chat-typing.show { display:block; }
+.chat-input-row { display: flex; padding: 7px; gap: 5px; border-top: 1px solid #eee; }
+.chat-input {
+  flex:1; padding: 7px 11px; border-radius: 20px;
+  border: 1.5px solid #ddd; font-family: inherit; font-size: 0.83rem; outline: none;
+}
+.chat-send-btn {
+  background: var(--primary); color: white;
+  border: none; border-radius: 50%; width: 32px; height: 32px;
+  cursor: pointer; font-size: 0.95rem;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* ===== FOOTER ===== */
+footer {
+  background: var(--dark); color: #ccc;
+  padding: 36px 16px 20px; margin-top: 36px;
+}
+.footer-grid {
+  max-width: 1100px; margin: 0 auto;
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 24px; margin-bottom: 24px;
+}
+.footer-brand .logo-text { font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--gold); }
+.footer-brand p { font-size: 0.83rem; margin-top: 7px; line-height: 1.6; }
+.footer-h { font-weight: 700; color: white; margin-bottom: 10px; font-size: 0.92rem; }
+.footer-link { color: #aaa; text-decoration: none; font-size: 0.83rem; display: block; margin-bottom: 5px; }
+.footer-link:hover { color: var(--gold); }
+.social-links { display: flex; gap: 8px; margin-top: 9px; }
+.social-link {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center;
+  text-decoration: none; font-size: 0.95rem; transition: background 0.2s;
+}
+.social-link:hover { background: var(--primary); }
+.footer-bottom { border-top: 1px solid #333; padding-top: 18px; text-align: center; font-size: 0.78rem; color: #666; }
+
+/* ===== MISC ===== */
+.empty-state { text-align: center; padding: 36px; color: var(--text-light); }
+.empty-state-icon { font-size: 2.8rem; margin-bottom: 10px; }
+.toast {
+  position: fixed; top: 70px; right: 14px; z-index: 9999;
+  background: var(--dark); color: white;
+  padding: 11px 18px; border-radius: 9px;
+  font-size: 0.88rem; box-shadow: var(--shadow-lg);
+  display: flex; align-items: center; gap: 7px;
+  transform: translateX(200%); transition: transform 0.3s;
+  max-width: calc(100vw - 28px);
+}
+.toast.show { transform: translateX(0); }
+.toast.success { border-left: 4px solid #00b894; }
+.my-orders-section { padding: 14px 16px; max-width: 1100px; margin: 0 auto; }
+.my-orders-btn {
+  background: white; border: 2px solid var(--primary); color: var(--primary);
+  padding: 9px 18px; border-radius: 20px; cursor: pointer;
+  font-family: inherit; font-size: 0.88rem; font-weight: 600; transition: all 0.2s;
+}
+.my-orders-btn:hover { background: var(--primary); color: white; }
+.loading-spinner { text-align: center; padding: 36px; }
+.spinner {
+  width: 38px; height: 38px; border-radius: 50%;
+  border: 3px solid #eee; border-top-color: var(--primary);
+  animation: spin 0.8s linear infinite; margin: 0 auto 10px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media(max-width:480px) {
+  .nav-links { display: none; }
+  .food-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .food-info { padding: 8px; }
+  .location-card { flex-direction: column; text-align:center; }
+}
+
+/* ===== PROFILE MODAL ===== */
+.profile-modal-bg {
+  display:none; position:fixed; inset:0;
+  background:rgba(0,0,0,0.6); z-index:5000;
+  align-items:center; justify-content:center;
+}
+.profile-modal-bg.open { display:flex; }
+.profile-modal {
+  background:white; border-radius:20px;
+  padding:28px; width:min(360px,92vw);
+  box-shadow:0 20px 60px rgba(0,0,0,0.3);
+  animation: fadeIn 0.25s ease;
+}
+.profile-modal h3 { font-family:'Playfair Display',serif; font-size:1.2rem; margin-bottom:6px; }
+.profile-modal p { font-size:0.83rem; color:var(--text-light); margin-bottom:18px; }
+.profile-modal .form-input { margin-bottom:11px; }
+.profile-save-btn {
+  width:100%; padding:13px; background:var(--primary); color:white;
+  border:none; border-radius:var(--radius); font-family:inherit;
+  font-size:0.95rem; font-weight:700; cursor:pointer; transition:background 0.2s;
+}
+.profile-save-btn:hover { background:var(--primary-dark); }
+
+/* ===== HOME HISTORY SECTION ===== */
+.home-history {
+  padding: 20px 16px; max-width:1100px; margin:0 auto;
+}
+.history-cards { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:12px; }
+.history-order-card {
+  background:white; border-radius:var(--radius);
+  padding:14px; box-shadow:0 2px 10px rgba(0,0,0,0.07);
+  border-left:4px solid var(--primary);
+}
+.history-card-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+.history-order-id { font-weight:700; font-size:0.9rem; }
+.history-status { font-size:0.72rem; font-weight:700; padding:3px 9px; border-radius:9px; }
+.history-items-text { font-size:0.8rem; color:var(--text-light); margin-bottom:8px; }
+.history-amounts { display:flex; gap:14px; }
+.history-amount-item { font-size:0.82rem; }
+.history-amount-label { color:var(--text-light); }
+.history-amount-value { font-weight:700; color:var(--primary); }
+
+/* ===== DIRECT BUY BTN ===== */
+.food-buy-btn {
+  background: var(--gold); color: var(--dark);
+  border: none; border-radius: var(--radius-sm);
+  padding: 6px 10px; font-size: 0.73rem; font-weight: 700;
+  cursor: pointer; margin-top: 7px; width: 100%;
+  font-family: inherit; transition: background 0.2s;
+}
+.food-buy-btn:hover { background: #e08e0b; }
+
+/* Share modal */
+.share-modal-bg {
+  display:none; position:fixed; inset:0;
+  background:rgba(0,0,0,0.5); z-index:4000;
+  align-items:center; justify-content:center;
+}
+.share-modal-bg.open { display:flex; }
+.share-modal {
+  background:white; border-radius:var(--radius);
+  padding:24px; width:min(340px,90vw);
+  box-shadow:var(--shadow-lg); animation: fadeIn 0.2s;
+}
+@keyframes fadeIn { from{opacity:0;transform:scale(0.9)} to{opacity:1;transform:scale(1)} }
+.share-modal h4 { font-family:'Playfair Display',serif; margin-bottom:14px; }
+.share-link-box {
+  display:flex; gap:8px; margin-bottom:14px;
+}
+.share-link-input {
+  flex:1; padding:10px; border:2px solid #eee; border-radius:8px;
+  font-size:0.8rem; font-family:inherit; outline:none; color:#666;
+}
+.share-copy-btn {
+  background:var(--primary); color:white; border:none;
+  border-radius:8px; padding:10px 14px; cursor:pointer;
+  font-family:inherit; font-size:0.83rem; font-weight:700;
+}
+.share-btns { display:flex; gap:8px; flex-wrap:wrap; }
+.share-wa-btn {
+  background:#25D366; color:white; border:none; border-radius:20px;
+  padding:9px 16px; cursor:pointer; font-family:inherit; font-size:0.83rem;
+  display:flex; align-items:center; gap:6px;
+}
+.share-close-btn {
+  background:#f0f0f0; color:var(--text); border:none; border-radius:20px;
+  padding:9px 14px; cursor:pointer; font-family:inherit; font-size:0.83rem;
+}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav>
+  <a href="#" class="nav-logo">
+    <img src="kaliaff.jpg" alt="Kaliaff" id="navLogoImg" onerror="this.style.display='none';document.getElementById('navLogoFallback').style.display='flex'">
+    <div id="navLogoFallback" style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#c0392b,#f39c12);display:none;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-weight:900;color:white;font-size:1rem;border:2px solid #f39c12;">K</div>
+    <div>
+      <span class="nav-logo-text" id="siteNameNav">Kaliaff</span>
+      <span class="nav-logo-sub">Deshi &amp; Bideshi Food</span>
+    </div>
+  </a>
+  <div class="nav-links">
+    <a href="#foods">Menu</a>
+    <a href="#location">📍 Location</a>
+    <a href="#" onclick="showMyOrders()">আমার অর্ডার</a>
+  </div>
+  <div class="nav-right">
+    <button class="cart-btn" onclick="openCart()">
+      🛒 <span class="cart-count" id="cartCount">0</span>
+    </button>
+  </div>
+</nav>
+
+<!-- NOTICE BOARD -->
+<div class="notice-board" id="noticeBoard">
+  <div class="notice-ticker">
+    <span class="notice-label">📢 নোটিশ</span>
+    <div class="notice-scroll-wrap">
+      <div class="notice-scroll" id="noticeScroll"></div>
+    </div>
+  </div>
+</div>
+
+<!-- BANNER -->
+<div class="banner-section" id="bannerSection">
+  <div class="banner-slider" id="bannerSlider">
+    <div class="banner-slide active" style="background:linear-gradient(135deg,#1a0a00,#922b21)">
+      <div class="banner-content">
+        <span class="banner-badge">🔥 স্পেশাল অফার</span>
+        <h1 class="banner-title">স্বাদের দুনিয়ায় স্বাগতম!</h1>
+        <p class="banner-sub">দেশি ও বিদেশি সেরা খাবার</p>
+        <div class="banner-btns">
+          <button class="banner-cta" onclick="document.getElementById('foods').scrollIntoView({behavior:'smooth'})">অর্ডার করুন →</button>
+        </div>
+      </div>
+      <div class="banner-deco">🍛</div>
+    </div>
+  </div>
+  <div class="banner-dots" id="bannerDots">
+    <button class="banner-dot active"></button>
+  </div>
+</div>
+
+<!-- FOOD GRID -->
+<div id="foods" style="padding: 24px 0 8px;">
+  <div class="section" style="padding-bottom:12px;">
+    <div class="section-title">আমাদের <span>মেনু</span><div class="section-line"></div></div>
+  </div>
+  <div class="food-grid" id="foodGrid">
+    <div class="loading-spinner" style="grid-column:1/-1"><div class="spinner"></div><p style="color:#aaa;font-size:0.88rem;">লোড হচ্ছে...</p></div>
+  </div>
+</div>
+
+<!-- LOCATION SECTION -->
+<div id="location" class="location-section">
+  <div class="section-title" style="margin-bottom:14px;">আমাদের <span>লোকেশন</span><div class="section-line"></div></div>
+  <div class="location-card">
+    <div class="location-icon">📍</div>
+    <div class="location-info">
+      <div class="location-name" id="locationName">Kaliaff Restaurant</div>
+      <div class="location-address" id="locationAddress">ঠিকানা লোড হচ্ছে...</div>
+    </div>
+    <a class="location-btn" id="locationBtn" href="#" target="_blank">🗺️ ম্যাপে দেখুন</a>
+  </div>
+</div>
+
+<!-- MY ORDERS -->
+<div class="my-orders-section">
+  <button class="my-orders-btn" onclick="showMyOrders()">📋 আমার অর্ডার দেখুন</button>
+</div>
+<div id="myOrdersList" style="display:none; padding:0 16px; max-width:1100px; margin:0 auto;"></div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div class="logo-text" id="footerLogo">Kaliaff</div>
+      <p>সেরা দেশি ও বিদেশি খাবারের স্বাদ আপনার দরজায়।</p>
+      <div class="social-links" id="socialLinks">
+        <a href="#" class="social-link" id="fbLink">📘</a>
+        <a href="#" class="social-link" id="waLink">💬</a>
+        <a href="#" class="social-link" id="mailLink">📧</a>
+      </div>
+    </div>
+    <div>
+      <div class="footer-h">যোগাযোগ</div>
+      <span class="footer-link" id="footerPhone">লোড হচ্ছে...</span>
+      <span class="footer-link" id="footerAddress">লোড হচ্ছে...</span>
+    </div>
+    <div>
+      <div class="footer-h">ডেলিভারি তথ্য</div>
+      <p style="font-size:0.83rem;color:#aaa;" id="deliveryInfo">লোড হচ্ছে...</p>
+    </div>
+  </div>
+  <div class="footer-bottom">© 2025 Kaliaff Restaurant. সকল অধিকার সংরক্ষিত।</div>
+</footer>
+
+<!-- CART DRAWER -->
+<div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
+<div class="cart-drawer" id="cartDrawer">
+  <div class="cart-header">
+    <h3>🛒 আপনার কার্ট</h3>
+    <button class="cart-close" onclick="closeCart()">✕</button>
+  </div>
+  <div class="cart-items" id="cartItems">
+    <div class="empty-state"><div class="empty-state-icon">🛒</div><p>কার্ট খালি</p></div>
+  </div>
+  <div class="cart-footer">
+    <div class="cart-total-row"><span class="cart-total-label">সাবটোটাল</span><span class="cart-total-value" id="cartSubtotal">৳০</span></div>
+    <div class="cart-total-row"><span class="cart-total-label">ডেলিভারি</span><span class="cart-total-value" id="cartDelivery">৳০</span></div>
+    <div class="cart-total-row cart-grand"><span>মোট</span><span id="cartTotal">৳০</span></div>
+    <button class="cart-checkout-btn" onclick="openCheckout()">অর্ডার করুন →</button>
+    <button class="wa-order-btn" onclick="sendWhatsAppOrder()">💬 WhatsApp-এ অর্ডার</button>
+  </div>
+</div>
+
+<!-- FOOD MODAL -->
+<div class="modal-overlay" id="foodModalOverlay" onclick="closeFoodModal(event)">
+  <div class="food-modal" id="foodModal">
+    <div style="position:relative;">
+      <img id="modalImg" src="" alt="" class="modal-img">
+      <button class="modal-close-btn" onclick="closeFoodModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-name" id="modalName"></div>
+      <p class="modal-desc" id="modalDesc"></p>
+      <div id="variantSection" style="display:none;">
+        <div class="variant-label">সাইজ / ভেরিয়েন্ট বেছে নিন:</div>
+        <div class="variants" id="variantBtns"></div>
+      </div>
+      <div class="modal-price-row">
+        <div>
+          <span class="modal-price" id="modalPrice"></span>
+          <span class="modal-old-price" id="modalOldPrice"></span>
+        </div>
+        <div class="cart-qty">
+          <button class="qty-btn" onclick="changeModalQty(-1)">−</button>
+          <span class="qty-num" id="modalQty">1</span>
+          <button class="qty-btn" onclick="changeModalQty(1)">+</button>
+        </div>
+      </div>
+      <div class="modal-action-row">
+        <button class="modal-share-btn" onclick="shareCurrentFood()" title="শেয়ার করুন">🔗</button>
+        <button class="modal-add-btn" onclick="addToCartFromModal()">কার্টে যোগ করুন 🛒</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CHECKOUT MODAL -->
+<div class="modal-overlay" id="checkoutOverlay" onclick="closeCheckout(event)">
+  <div class="checkout-modal">
+    <div class="checkout-header"><h3>📦 অর্ডার করুন</h3></div>
+    <div class="checkout-body">
+      <div class="form-group">
+        <label class="form-label">আপনার নাম *</label>
+        <input class="form-input" id="cName" placeholder="আপনার পূর্ণ নাম লিখুন" type="text">
+      </div>
+      <div class="form-group">
+        <label class="form-label">মোবাইল নম্বর *</label>
+        <input class="form-input" id="cPhone" placeholder="01XXXXXXXXX" type="tel">
+      </div>
+      <div class="form-group">
+        <label class="form-label">ডেলিভারি ঠিকানা *</label>
+        <textarea class="form-input form-textarea" id="cAddress" placeholder="বিস্তারিত ঠিকানা লিখুন"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">পেমেন্ট পদ্ধতি *</label>
+        <div class="payment-options">
+          <label class="payment-opt" id="optCOD" onclick="selectPayment('cod')">
+            <input type="radio" name="payment" value="cod">
+            <div>
+              <div class="payment-opt-label">💵 Cash on Delivery</div>
+              <div class="payment-opt-sub">ডেলিভারির সময় টাকা দিন</div>
+            </div>
+          </label>
+          <label class="payment-opt" id="optAdvance" onclick="selectPayment('advance')">
+            <input type="radio" name="payment" value="advance">
+            <div>
+              <div class="payment-opt-label">📱 Advance Payment</div>
+              <div class="payment-opt-sub">bKash / Nagad এ আগে পেমেন্ট করুন</div>
+            </div>
+          </label>
+        </div>
+      </div>
+      <div id="advancePaySection" style="display:none;">
+        <div class="payment-numbers" id="paymentNumbers">
+          <div class="pay-num-row">
+            <span class="pay-num-label">📱 bKash:</span>
+            <span class="pay-num-value" id="bkashNum">লোড হচ্ছে...</span>
+          </div>
+          <div class="pay-num-row">
+            <span class="pay-num-label">📱 Nagad:</span>
+            <span class="pay-num-value" id="nagadNum">লোড হচ্ছে...</span>
+          </div>
+          <p style="font-size:0.73rem;color:#e74c3c;margin-top:7px;">⚠️ Send Money করে Transaction ID দিন</p>
+        </div>
+        <div class="form-group" style="margin-top:10px;">
+          <label class="form-label">Transaction ID *</label>
+          <input class="form-input" id="cTrxId" placeholder="TRX ID লিখুন">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Screenshot (ঐচ্ছিক)</label>
+          <div class="trx-upload" onclick="document.getElementById('ssInput').click()">
+            <span id="ssLabel">📸 Screenshot আপলোড করুন</span>
+            <input type="file" id="ssInput" accept="image/*" style="display:none" onchange="handleSSUpload(this)">
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">বিশেষ নির্দেশনা</label>
+        <textarea class="form-input form-textarea" id="cNote" placeholder="যেকোনো বিশেষ নির্দেশনা..."></textarea>
+      </div>
+      <div style="background:var(--light);border-radius:9px;padding:11px;margin-bottom:14px;">
+        <div class="cart-total-row"><span class="cart-total-label">সাবটোটাল</span><span id="chkSubtotal">৳০</span></div>
+        <div class="cart-total-row"><span class="cart-total-label">ডেলিভারি চার্জ</span><span id="chkDelivery">৳০</span></div>
+        <div class="cart-total-row" style="font-weight:700;font-size:1rem;color:var(--primary);"><span>মোট</span><span id="chkTotal">৳০</span></div>
+      </div>
+      <button class="place-order-btn" onclick="placeOrder()">✅ অর্ডার দিন</button>
+    </div>
+  </div>
+</div>
+
+<!-- PROFILE MODAL -->
+<div class="profile-modal-bg" id="profileModalBg">
+  <div class="profile-modal">
+    <h3>👤 আপনার তথ্য দিন</h3>
+    <p id="profileModalMsg">চ্যাট করতে আপনার নাম ও মোবাইল নম্বর দিন। একবার দিলে পরে আর লাগবে না।</p>
+    <input class="form-input" id="profileName" placeholder="আপনার পূর্ণ নাম *" type="text">
+    <input class="form-input" id="profilePhone" placeholder="মোবাইল নম্বর * (01XXXXXXXXX)" type="tel">
+    <button class="profile-save-btn" onclick="saveProfile()">✅ সেভ করে চালিয়ে যান</button>
+  </div>
+</div>
+
+<!-- HOME HISTORY SECTION -->
+<div class="home-history" id="homeHistorySection" style="display:none;">
+  <div class="section-title">আমার <span>অর্ডার ইতিহাস</span><div class="section-line"></div></div>
+  <div class="history-cards" id="homeHistoryCards"></div>
+</div>
+
+<!-- SHARE MODAL -->
+<div class="share-modal-bg" id="shareModalBg" onclick="if(event.target===this)closeShareModal()">
+  <div class="share-modal">
+    <h4>🔗 শেয়ার করুন</h4>
+    <div class="share-link-box">
+      <input class="share-link-input" id="shareLinkInput" readonly>
+      <button class="share-copy-btn" onclick="copyShareLink()">কপি</button>
+    </div>
+    <div class="share-btns">
+      <button class="share-wa-btn" onclick="shareViaWA()">💬 WhatsApp</button>
+      <button class="share-close-btn" onclick="closeShareModal()">বন্ধ</button>
+    </div>
+  </div>
+</div>
+
+<!-- LIVE CHAT -->
+<button class="live-chat-btn" onclick="toggleChat()" style="position:relative;">
+  💬
+  <span class="chat-notif-dot" id="chatNotifDot"></span>
+</button>
+<div class="chat-window" id="chatWindow">
+  <div class="chat-win-header">
+    <div>
+      <div class="chat-win-title">🍽️ Kaliaff Support</div>
+      <div class="chat-win-status" id="chatStatus">● অনলাইন</div>
+    </div>
+    <button onclick="toggleChat()" style="background:none;border:none;color:white;cursor:pointer;font-size:1rem;">✕</button>
+  </div>
+  <div class="chat-messages" id="chatMessages">
+    <div class="chat-msg bot">আস্সালামুয়ালাইকুম! 👋 Kaliaff-এ স্বাগতম। কিভাবে সাহায্য করতে পারি?</div>
+  </div>
+  <div class="chat-typing" id="chatTyping">Admin টাইপ করছে...</div>
+  <div class="chat-input-row">
+    <input class="chat-input" id="chatInput" placeholder="মেসেজ লিখুন..." onkeypress="if(event.key==='Enter')sendChat()">
+    <button class="chat-send-btn" onclick="sendChat()">➤</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- NOTIFICATION SOUND -->
+<audio id="notifSound" preload="auto">
+  <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhS0hni6yqlGpUTGN9nKqZfGBMSmGBmaWTe2FNSmB/mKORe2JOSWB+l6KQe2FOSWB+l6GQXW8=" type="audio/wav">
+</audio>
+
+<!-- FIREBASE SDK -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs, doc, getDoc, query, where, orderBy, serverTimestamp, onSnapshot, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getStorage, ref, uploadString, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCNNDZZddVghLpD8y6CVhKj2ZH3HAHYAzI",
+  authDomain: "kaliaff.firebaseapp.com",
+  projectId: "kaliaff",
+  storageBucket: "kaliaff.firebasestorage.app",
+  messagingSenderId: "193034886013",
+  appId: "1:193034886013:web:66b5e0571a4d9aec704a14",
+  measurementId: "G-L87LV3EBT6"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const storage = getStorage(app);
+
+window._db = db; window._storage = storage;
+window._addDoc = addDoc; window._getDocs = getDocs;
+window._doc = doc; window._getDoc = getDoc;
+window._collection = collection; window._query = query;
+window._where = where; window._orderBy = orderBy;
+window._serverTimestamp = serverTimestamp;
+window._onSnapshot = onSnapshot; window._updateDoc = updateDoc;
+window._ref = ref; window._uploadString = uploadString;
+window._getDownloadURL = getDownloadURL;
+
+window.initApp();
+</script>
+
+<script>
+let cart = JSON.parse(localStorage.getItem('kaliaff_cart') || '[]');
+let allFoods = [];
+let settings = {};
+let currentFood = null;
+let currentVariant = null;
+let modalQty = 1;
+let selectedPayment = 'cod';
+let ssBase64 = null;
+let banners = [];
+let bannerIdx = 0;
+let chatSessionId = 'user_' + Date.now() + '_' + Math.random().toString(36).slice(2,7);
+let chatUnsubscribe = null;
+let shareFood = null;
+
+// ===== INIT =====
+window.initApp = async function() {
+  await loadSettings();
+  await loadFoods();
+  loadBanners();
+  loadNotices();
+  updateCartUI();
+  checkProductDeepLink();
+  initLiveChat();
+  loadHomeHistory();
+}
+
+// ===== PROFILE =====
+function getProfile() {
+  try { return JSON.parse(localStorage.getItem('kaliaff_profile') || 'null'); } catch(e){ return null; }
+}
+
+window.saveProfile = function() {
+  const name = document.getElementById('profileName').value.trim();
+  const phone = document.getElementById('profilePhone').value.trim();
+  if(!name) { showToast('নাম লিখুন!'); return; }
+  if(!phone || phone.length < 10) { showToast('সঠিক মোবাইল নম্বর দিন!'); return; }
+  localStorage.setItem('kaliaff_profile', JSON.stringify({name, phone}));
+  document.getElementById('profileModalBg').classList.remove('open');
+  // Execute pending action
+  if(window._pendingProfileAction) {
+    const action = window._pendingProfileAction;
+    window._pendingProfileAction = null;
+    action();
+  }
+  showToast('✅ প্রোফাইল সেভ হয়েছে!', 'success');
+}
+
+function requireProfile(msg, callback) {
+  const profile = getProfile();
+  if(profile && profile.name && profile.phone) {
+    callback();
+    return;
+  }
+  document.getElementById('profileModalMsg').textContent = msg || 'চালিয়ে যেতে নাম ও মোবাইল নম্বর দিন।';
+  document.getElementById('profileModalBg').classList.add('open');
+  window._pendingProfileAction = callback;
+}
+
+// ===== HOME HISTORY =====
+async function loadHomeHistory() {
+  const myOrders = JSON.parse(localStorage.getItem('kaliaff_orders') || '[]');
+  if(!myOrders.length) return;
+  const section = document.getElementById('homeHistorySection');
+  section.style.display = 'block';
+  const cards = document.getElementById('homeHistoryCards');
+  cards.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
+  try {
+    const snap = await _getDocs(_collection(_db, 'orders'));
+    const ids = myOrders.map(o=>o.orderId);
+    const orders = [];
+    snap.forEach(d => { const data=d.data(); if(ids.includes(data.orderId)) orders.push(data); });
+    orders.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
+    if(!orders.length) { section.style.display='none'; return; }
+    const statusLabel = {pending:'অপেক্ষায়',confirmed:'নিশ্চিত',shipping:'ডেলিভারিতে',delivered:'সম্পন্ন',cancelled:'বাতিল'};
+    const statusColor = {pending:'#f39c12',confirmed:'#2980b9',shipping:'#8e44ad',delivered:'#27ae60',cancelled:'#e74c3c'};
+    cards.innerHTML = orders.slice(0,5).map(o => `
+      <div class="history-order-card">
+        <div class="history-card-top">
+          <span class="history-order-id">🧾 ${o.orderId}</span>
+          <span class="history-status" style="background:${statusColor[o.status]||'#999'}20;color:${statusColor[o.status]||'#999'}">${statusLabel[o.status]||o.status}</span>
+        </div>
+        <div class="history-items-text">${(o.items||[]).map(i=>i.name+'×'+i.qty).join(', ')}</div>
+        <div class="history-amounts">
+          <div class="history-amount-item"><div class="history-amount-label">সাবটোটাল</div><div class="history-amount-value">৳${o.subtotal||0}</div></div>
+          <div class="history-amount-item"><div class="history-amount-label">ডেলিভারি</div><div class="history-amount-value">৳${o.delivery||0}</div></div>
+          <div class="history-amount-item"><div class="history-amount-label">মোট</div><div class="history-amount-value" style="color:var(--primary)">৳${o.total||0}</div></div>
+          ${o.payment==='advance'?`<div class="history-amount-item"><div class="history-amount-label">Advance</div><div class="history-amount-value" style="color:#27ae60">✅ দেওয়া</div></div>`:''}
+        </div>
+      </div>`).join('');
+  } catch(e) { section.style.display='none'; }
+}
+
+// ===== SETTINGS =====
+async function loadSettings() {
+  try {
+    const snap = await _getDocs(_collection(_db, 'settings'));
+    snap.forEach(d => { settings = {...settings, ...d.data(), id: d.id}; });
+    applySettings();
+  } catch(e) {}
+}
+
+function applySettings() {
+  if(settings.siteName) {
+    document.getElementById('siteNameNav').textContent = settings.siteName;
+    document.getElementById('footerLogo').textContent = settings.siteName;
+    document.title = settings.siteName + ' - Deshi & Bideshi Food';
+  }
+  if(settings.phone) document.getElementById('footerPhone').textContent = '📞 ' + settings.phone;
+  if(settings.address) {
+    document.getElementById('footerAddress').textContent = '📍 ' + settings.address;
+    document.getElementById('locationAddress').textContent = settings.address;
+  }
+  if(settings.siteName) document.getElementById('locationName').textContent = settings.siteName;
+  if(settings.locationLink) {
+    document.getElementById('locationBtn').href = settings.locationLink;
+  } else if(settings.address) {
+    document.getElementById('locationBtn').href = 'https://maps.google.com/?q=' + encodeURIComponent(settings.address);
+  }
+  if(settings.deliveryBase) {
+    document.getElementById('deliveryInfo').textContent = `ডেলিভারি চার্জ: ৳${settings.deliveryBase} থেকে শুরু`;
+  }
+  if(settings.bkash) document.getElementById('bkashNum').textContent = settings.bkash;
+  if(settings.nagad) document.getElementById('nagadNum').textContent = settings.nagad;
+  if(settings.fbLink) document.getElementById('fbLink').href = settings.fbLink;
+  if(settings.waNumber) {
+    document.getElementById('waLink').href = 'https://wa.me/' + settings.waNumber;
+    window._waNumber = settings.waNumber;
+  }
+  if(settings.email) document.getElementById('mailLink').href = 'mailto:' + settings.email;
+}
+
+// ===== NOTICES =====
+async function loadNotices() {
+  try {
+    const snap = await _getDocs(_collection(_db, 'notices'));
+    const notices = [];
+    snap.forEach(d => { const data = d.data(); if(data.active !== false) notices.push(data); });
+    if(notices.length > 0) {
+      const board = document.getElementById('noticeBoard');
+      board.classList.add('has-notices');
+      const scroll = document.getElementById('noticeScroll');
+      const items = notices.map(n => `<span class="notice-item">📣 ${n.text}</span>`).join('');
+      scroll.innerHTML = items + items; // duplicate for seamless loop
+    }
+  } catch(e) {}
+}
+
+// ===== BANNERS =====
+async function loadBanners() {
+  try {
+    const snap = await _getDocs(_collection(_db, 'banners'));
+    banners = [];
+    snap.forEach(d => banners.push({id:d.id, ...d.data()}));
+    if(banners.length > 0) renderBanners();
+  } catch(e) {}
+}
+
+function renderBanners() {
+  const slider = document.getElementById('bannerSlider');
+  const dots = document.getElementById('bannerDots');
+  slider.innerHTML = ''; dots.innerHTML = '';
+  banners.forEach((b, i) => {
+    const slide = document.createElement('div');
+    slide.className = 'banner-slide' + (i===0?' active':'');
+    const productLink = b.productLink ? `<a href="${b.productLink}" class="banner-link-btn">🛍️ পণ্য দেখুন</a>` : '';
+    slide.innerHTML = `
+      <div class="banner-content">
+        ${b.badge?`<span class="banner-badge">${b.badge}</span>`:''}
+        <h1 class="banner-title">${b.title||''}</h1>
+        <p class="banner-sub">${b.subtitle||''}</p>
+        <div class="banner-btns">
+          ${b.cta?`<button class="banner-cta" onclick="document.getElementById('foods').scrollIntoView({behavior:'smooth'})">${b.cta}</button>`:''}
+          ${productLink}
+        </div>
+      </div>
+      ${b.image?`<img src="${b.image}" class="banner-img">`:`<div class="banner-deco">${b.emoji||'🍛'}</div>`}
+    `;
+    slide.style.background = b.bgColor || 'linear-gradient(135deg,#1a0a00,#922b21)';
+    slider.appendChild(slide);
+    const dot = document.createElement('button');
+    dot.className = 'banner-dot'+(i===0?' active':'');
+    dot.onclick = () => showBanner(i);
+    dots.appendChild(dot);
+  });
+  if(banners.length > 1) setInterval(() => showBanner((bannerIdx+1)%banners.length), 4500);
+}
+
+function showBanner(idx) {
+  bannerIdx = idx;
+  document.querySelectorAll('.banner-slide').forEach((s,i) => s.classList.toggle('active', i===idx));
+  document.querySelectorAll('.banner-dot').forEach((d,i) => d.classList.toggle('active', i===idx));
+}
+
+// ===== FOODS =====
+async function loadFoods() {
+  const grid = document.getElementById('foodGrid');
+  try {
+    const snap = await _getDocs(_collection(_db, 'foods'));
+    allFoods = [];
+    snap.forEach(d => allFoods.push({id:d.id, ...d.data()}));
+    allFoods = allFoods.filter(f => f.active !== false);
+    renderFoods(allFoods);
+  } catch(e) {
+    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="empty-state-icon">⚠️</div><p>লোড করতে সমস্যা হয়েছে</p></div>';
+  }
+}
+
+function renderFoods(foods) {
+  const grid = document.getElementById('foodGrid');
+  if(!foods.length) {
+    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="empty-state-icon">🍽️</div><p>কোনো খাবার পাওয়া যায়নি</p></div>';
+    return;
+  }
+  grid.innerHTML = foods.map(f => {
+    const hasDiscount = f.discount > 0;
+    const origPrice = f.price || 0;
+    const discountedPrice = hasDiscount ? Math.round(origPrice * (1 - f.discount/100)) : origPrice;
+    return `
+    <div class="food-card" onclick="openFoodModal('${f.id}')">
+      <div class="food-img-wrap">
+        <img src="${f.image||'https://via.placeholder.com/300x200/c0392b/white?text='+encodeURIComponent(f.name)}" alt="${f.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/300x200/c0392b/white?text=Food'">
+        ${hasDiscount?`<span class="food-badge-discount">${f.discount}% OFF</span>`:''}
+        ${f.tag?`<span class="food-badge-tag">${f.tag}</span>`:''}
+        <button class="food-share-btn" onclick="event.stopPropagation();openShareModal('${f.id}')" title="শেয়ার">🔗</button>
+      </div>
+      <div class="food-info">
+        <div class="food-name">${f.name}</div>
+        ${f.description?`<div class="food-desc">${f.description.substring(0,55)}${f.description.length>55?'...':''}</div>`:''}
+        <div class="food-price-row">
+          <div>
+            <span class="food-price">৳${discountedPrice}</span>
+            ${hasDiscount?`<span class="food-old-price">৳${origPrice}</span>`:''}
+          </div>
+          <button class="food-add-btn" onclick="event.stopPropagation();quickAdd('${f.id}')">+</button>
+        </div>
+        <button class="food-buy-btn" onclick="event.stopPropagation();directBuy('${f.id}')">⚡ এখনই কিনুন</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ===== DIRECT BUY =====
+window.directBuy = function(foodId) {
+  const food = allFoods.find(f=>f.id===foodId); if(!food) return;
+  // Clear cart, add this item, open checkout
+  const hasVariants = food.variants && food.variants.length > 0;
+  if(hasVariants) {
+    openFoodModal(foodId);
+  } else {
+    cart = [];
+    const price = food.discount > 0 ? Math.round(food.price*(1-food.discount/100)) : food.price;
+    cart.push({id:food.id, name:food.name, image:food.image, price, qty:1, variant:null});
+    saveCart(); updateCartUI();
+    openCheckout();
+  }
+}
+
+// ===== DEEP LINK =====
+function checkProductDeepLink() {
+  const params = new URLSearchParams(window.location.search);
+  const pid = params.get('product');
+  if(pid) {
+    setTimeout(() => {
+      const food = allFoods.find(f=>f.id===pid);
+      if(food) openFoodModal(pid);
+      else document.getElementById('foods').scrollIntoView({behavior:'smooth'});
+    }, 800);
+  }
+}
+
+// ===== SHARE =====
+window.openShareModal = function(foodId) {
+  shareFood = allFoods.find(f=>f.id===foodId);
+  if(!shareFood) return;
+  const url = window.location.origin + window.location.pathname + '?product=' + foodId;
+  document.getElementById('shareLinkInput').value = url;
+  document.getElementById('shareModalBg').classList.add('open');
+}
+window.shareCurrentFood = function() {
+  if(currentFood) openShareModal(currentFood.id);
+}
+window.copyShareLink = function() {
+  const input = document.getElementById('shareLinkInput');
+  navigator.clipboard.writeText(input.value).then(() => showToast('✅ লিংক কপি হয়েছে!', 'success')).catch(() => {
+    input.select(); document.execCommand('copy'); showToast('✅ লিংক কপি হয়েছে!', 'success');
+  });
+}
+window.shareViaWA = function() {
+  if(!shareFood) return;
+  const url = document.getElementById('shareLinkInput').value;
+  const text = `🍽️ *${shareFood.name}* - Kaliaff Restaurant\n\n${shareFood.description||''}\n\n👉 ${url}`;
+  window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
+}
+window.closeShareModal = function() {
+  document.getElementById('shareModalBg').classList.remove('open');
+}
+
+// ===== FOOD MODAL =====
+window.openFoodModal = function(id) {
+  const food = allFoods.find(f=>f.id===id);
+  if(!food) return;
+  currentFood = food; modalQty = 1; currentVariant = null;
+  const hasDiscount = food.discount > 0;
+  const origPrice = food.price || 0;
+  const discountedPrice = hasDiscount ? Math.round(origPrice * (1 - food.discount/100)) : origPrice;
+  document.getElementById('modalImg').src = food.image || 'https://via.placeholder.com/480x210/c0392b/white?text=Food';
+  document.getElementById('modalName').textContent = food.name;
+  document.getElementById('modalDesc').textContent = food.description || '';
+  document.getElementById('modalPrice').textContent = '৳' + discountedPrice;
+  document.getElementById('modalOldPrice').textContent = hasDiscount ? '৳' + origPrice : '';
+  document.getElementById('modalQty').textContent = '1';
+  // Image gallery
+  const imgs = food.images && food.images.length > 1 ? food.images : null;
+  let galleryEl = document.getElementById('modalImgGallery');
+  if(!galleryEl) {
+    galleryEl = document.createElement('div');
+    galleryEl.id = 'modalImgGallery';
+    galleryEl.style.cssText = 'display:flex;gap:6px;padding:8px 14px;overflow-x:auto;';
+    document.getElementById('foodModal').querySelector('.food-modal > div:first-child').after(galleryEl);
+  }
+  if(imgs) {
+    galleryEl.style.display = 'flex';
+    galleryEl.innerHTML = imgs.map((src,i)=>`<img src="${src}" onclick="document.getElementById('modalImg').src='${src}'" style="width:56px;height:56px;object-fit:cover;border-radius:7px;cursor:pointer;border:2px solid ${i===0?'var(--primary)':'#ddd'};flex-shrink:0;" onerror="this.style.display='none'">`).join('');
+  } else {
+    galleryEl.style.display = 'none';
+    galleryEl.innerHTML = '';
+  }
+  const vs = food.variants;
+  if(vs && vs.length > 0) {
+    document.getElementById('variantSection').style.display = 'block';
+    document.getElementById('variantBtns').innerHTML = vs.map((v,i) => `
+      <button class="variant-btn ${i===0?'active':''}" onclick="selectVariant(this,'${v.name}',${v.price})">
+        ${v.name} - ৳${v.price}
+      </button>`).join('');
+    currentVariant = vs[0];
+    document.getElementById('modalPrice').textContent = '৳' + (hasDiscount ? Math.round(vs[0].price*(1-food.discount/100)) : vs[0].price);
+  } else {
+    document.getElementById('variantSection').style.display = 'none';
+  }
+  document.getElementById('foodModalOverlay').classList.add('open');
+}
+window.selectVariant = function(el, name, price) {
+  document.querySelectorAll('.variant-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active'); currentVariant = {name, price};
+  const hasDiscount = currentFood.discount > 0;
+  document.getElementById('modalPrice').textContent = '৳' + (hasDiscount ? Math.round(price*(1-currentFood.discount/100)) : price);
+}
+window.closeFoodModal = function(e) {
+  if(!e || e.target.id==='foodModalOverlay' || e.target.classList.contains('modal-close-btn')) {
+    document.getElementById('foodModalOverlay').classList.remove('open');
+  }
+}
+window.changeModalQty = function(d) {
+  modalQty = Math.max(1, modalQty + d);
+  document.getElementById('modalQty').textContent = modalQty;
+}
+window.addToCartFromModal = function() {
+  if(!currentFood) return;
+  const food = currentFood;
+  const hasDiscount = food.discount > 0;
+  const basePrice = currentVariant ? currentVariant.price : food.price;
+  const price = hasDiscount ? Math.round(basePrice*(1-food.discount/100)) : basePrice;
+  addToCart(food, currentVariant, price, modalQty);
+  closeFoodModal();
+}
+window.quickAdd = function(id) {
+  const food = allFoods.find(f=>f.id===id);
+  if(!food) return;
+  if(food.variants && food.variants.length > 0) { openFoodModal(id); return; }
+  const hasDiscount = food.discount > 0;
+  const price = hasDiscount ? Math.round(food.price*(1-food.discount/100)) : food.price;
+  addToCart(food, null, price, 1);
+}
+
+// ===== CART =====
+function addToCart(food, variant, price, qty) {
+  const key = food.id + (variant?'_'+variant.name:'');
+  const existing = cart.find(i => i.key===key);
+  if(existing) { existing.qty += qty; }
+  else { cart.push({key, id:food.id, name:food.name, image:food.image, variant:variant?variant.name:'', price, qty}); }
+  saveCart(); updateCartUI(); showToast('✅ কার্টে যোগ হয়েছে!', 'success');
+}
+function saveCart() { localStorage.setItem('kaliaff_cart', JSON.stringify(cart)); }
+function updateCartUI() {
+  const count = cart.reduce((s,i)=>s+i.qty,0);
+  document.getElementById('cartCount').textContent = count;
+  const subtotal = cart.reduce((s,i)=>s+(i.price*i.qty),0);
+  const delivery = getDeliveryCharge(subtotal);
+  document.getElementById('cartSubtotal').textContent = '৳' + subtotal;
+  document.getElementById('cartDelivery').textContent = '৳' + delivery;
+  document.getElementById('cartTotal').textContent = '৳' + (subtotal + delivery);
+  document.getElementById('chkSubtotal').textContent = '৳' + subtotal;
+  document.getElementById('chkDelivery').textContent = '৳' + delivery;
+  document.getElementById('chkTotal').textContent = '৳' + (subtotal + delivery);
+  renderCartItems();
+}
+function getDeliveryCharge(subtotal) { return parseInt(settings.deliveryBase || 40); }
+function renderCartItems() {
+  const el = document.getElementById('cartItems');
+  if(!cart.length) { el.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🛒</div><p>কার্ট খালি</p></div>'; return; }
+  el.innerHTML = cart.map((item,i) => `
+    <div class="cart-item">
+      <img src="${item.image||'https://via.placeholder.com/52x52/c0392b/white?text=F'}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/52x52/c0392b/white?text=F'">
+      <div class="cart-item-info">
+        <div class="cart-item-name">${item.name}</div>
+        ${item.variant?`<div class="cart-item-variant">${item.variant}</div>`:''}
+        <div class="cart-qty">
+          <button class="qty-btn" onclick="changeQty(${i},-1)">−</button>
+          <span class="qty-num">${item.qty}</span>
+          <button class="qty-btn" onclick="changeQty(${i},1)">+</button>
+        </div>
+      </div>
+      <div class="cart-item-price">৳${item.price * item.qty}</div>
+    </div>`).join('');
+}
+window.changeQty = function(i, d) {
+  cart[i].qty += d;
+  if(cart[i].qty <= 0) cart.splice(i, 1);
+  saveCart(); updateCartUI();
+}
+window.openCart = function() {
+  document.getElementById('cartOverlay').classList.add('open');
+  document.getElementById('cartDrawer').classList.add('open');
+}
+window.closeCart = function() {
+  document.getElementById('cartOverlay').classList.remove('open');
+  document.getElementById('cartDrawer').classList.remove('open');
+}
+
+// ===== CHECKOUT =====
+window.openCheckout = function() {
+  if(!cart.length) { showToast('কার্ট খালি!'); return; }
+  closeCart();
+  // Auto-fill profile data if saved
+  const profile = getProfile();
+  if(profile) {
+    document.getElementById('cName').value = profile.name || '';
+    document.getElementById('cPhone').value = profile.phone || '';
+  }
+  document.getElementById('checkoutOverlay').classList.add('open');
+}
+window.closeCheckout = function(e) {
+  if(!e || e.target.id==='checkoutOverlay') document.getElementById('checkoutOverlay').classList.remove('open');
+}
+window.selectPayment = function(type) {
+  selectedPayment = type;
+  document.getElementById('optCOD').classList.toggle('selected', type==='cod');
+  document.getElementById('optAdvance').classList.toggle('selected', type==='advance');
+  document.getElementById('advancePaySection').style.display = type==='advance' ? 'block' : 'none';
+}
+selectPayment('cod');
+window.handleSSUpload = function(input) {
+  const file = input.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => { ssBase64 = e.target.result; document.getElementById('ssLabel').textContent = '✅ ' + file.name; };
+  reader.readAsDataURL(file);
+}
+window.placeOrder = async function() {
+  const name = document.getElementById('cName').value.trim();
+  const phone = document.getElementById('cPhone').value.trim();
+  const address = document.getElementById('cAddress').value.trim();
+  const note = document.getElementById('cNote').value.trim();
+  const trxId = document.getElementById('cTrxId').value.trim();
+  if(!name||!phone||!address) { showToast('সব তথ্য পূরণ করুন!'); return; }
+  if(selectedPayment==='advance' && !trxId) { showToast('Transaction ID দিন!'); return; }
+  const subtotal = cart.reduce((s,i)=>s+(i.price*i.qty),0);
+  const delivery = getDeliveryCharge(subtotal);
+  const orderId = 'KF' + Date.now().toString().slice(-8);
+  let ssUrl = '';
+  if(ssBase64 && _storage) {
+    try {
+      const r = _ref(_storage, 'payments/'+orderId+'.jpg');
+      await _uploadString(r, ssBase64, 'data_url');
+      ssUrl = await _getDownloadURL(r);
+    } catch(e) {}
+  }
+  const orderData = {
+    orderId, name, phone, address, note,
+    items: cart.map(i=>({name:i.name, variant:i.variant, price:i.price, qty:i.qty})),
+    subtotal, delivery, total: subtotal+delivery,
+    payment: selectedPayment, trxId, ssUrl,
+    status: 'pending', createdAt: _serverTimestamp()
+  };
+  try {
+    await _addDoc(_collection(_db, 'orders'), orderData);
+    const myOrders = JSON.parse(localStorage.getItem('kaliaff_orders')||'[]');
+    myOrders.push({orderId, phone});
+    localStorage.setItem('kaliaff_orders', JSON.stringify(myOrders));
+    cart = []; saveCart(); updateCartUI();
+    // Save profile from checkout data
+    localStorage.setItem('kaliaff_profile', JSON.stringify({name, phone}));
+    document.getElementById('checkoutOverlay').classList.remove('open');
+    showToast('🎉 অর্ডার সফল! ID: ' + orderId, 'success');
+    setTimeout(() => { loadHomeHistory(); showMyOrders(); }, 1000);
+  } catch(e) { showToast('অর্ডার দিতে সমস্যা হয়েছে!'); }
+}
+
+// ===== WHATSAPP =====
+window.sendWhatsAppOrder = function() {
+  if(!cart.length) { showToast('কার্ট খালি!'); return; }
+  const waNum = window._waNumber || '8801XXXXXXXXX';
+  const items = cart.map(i=>`▪ ${i.name}${i.variant?' ('+i.variant+')':''} x${i.qty} = ৳${i.price*i.qty}`).join('\n');
+  const subtotal = cart.reduce((s,i)=>s+(i.price*i.qty),0);
+  const delivery = getDeliveryCharge(subtotal);
+  const msg = `🍽️ *Kaliaff Restaurant* - নতুন অর্ডার\n\n${items}\n\n💰 সাবটোটাল: ৳${subtotal}\n🚚 ডেলিভারি: ৳${delivery}\n✅ মোট: ৳${subtotal+delivery}\n\nআমি এই খাবারটি নিতে চাই।`;
+  window.open('https://wa.me/' + waNum + '?text=' + encodeURIComponent(msg), '_blank');
+}
+
+// ===== MY ORDERS =====
+window.showMyOrders = async function() {
+  const section = document.getElementById('myOrdersList');
+  section.style.display = 'block';
+  section.scrollIntoView({behavior:'smooth'});
+  const myOrders = JSON.parse(localStorage.getItem('kaliaff_orders')||'[]');
+  if(!myOrders.length) { section.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📋</div><p>কোনো অর্ডার নেই</p></div>'; return; }
+  section.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
+  try {
+    const ids = myOrders.map(o=>o.orderId);
+    const snap = await _getDocs(_collection(_db, 'orders'));
+    const orders = [];
+    snap.forEach(d => { const data = d.data(); if(ids.includes(data.orderId)) orders.push(data); });
+    orders.sort((a,b) => (b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
+    if(!orders.length) { section.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📋</div><p>অর্ডার পাওয়া যায়নি</p></div>'; return; }
+    section.innerHTML = `<div style="margin-bottom:14px;padding:0 16px;"><div class="section-title">আমার <span>অর্ডার</span><div class="section-line"></div></div></div>` +
+      orders.map(o => {
+        const steps = ['pending','confirmed','shipping','delivered'];
+        const stepLabels = ['অর্ডার হয়েছে','নিশ্চিত','ডেলিভারিতে','ডেলিভারি হয়েছে'];
+        const stepIcons = ['📋','✅','🚚','🎉'];
+        const curIdx = steps.indexOf(o.status);
+        return `<div class="order-card" style="margin:0 16px 14px;">
+          <div class="order-card-header">
+            <span class="order-id">🧾 ${o.orderId}</span>
+            <span class="order-status-badge status-${o.status}">${stepLabels[curIdx]||o.status}</span>
+          </div>
+          <div class="order-timeline">
+            ${steps.map((s,i)=>`
+              <div class="timeline-step ${i<=curIdx?'done':''}">
+                <div class="timeline-icon">${stepIcons[i]}</div>
+                <div class="timeline-label">${stepLabels[i]}</div>
+              </div>`).join('')}
+          </div>
+          <div style="padding:0 14px 10px;font-size:0.82rem;color:#666;">
+            ${o.items.map(it=>`${it.name} x${it.qty}`).join(', ')} | মোট: ৳${o.total}
+          </div>
+        </div>`;
+      }).join('');
+  } catch(e) { section.innerHTML = '<div class="empty-state"><p>লোড করতে সমস্যা হয়েছে</p></div>'; }
+}
+
+// ===== LIVE CHAT (Firebase Realtime) =====
+function initLiveChat() {
+  // Listen for admin replies
+  if(!window._onSnapshot) return;
+  const chatRef = _collection(_db, 'chats');
+  chatUnsubscribe = _onSnapshot(chatRef, snap => {
+    snap.docChanges().forEach(change => {
+      if(change.type === 'modified' || change.type === 'added') {
+        const data = change.doc.data();
+        if(data.sessionId === chatSessionId && data.adminReply && !data.userRead) {
+          showAdminReply(data.adminReply, change.doc.id);
+        }
+      }
+    });
+  });
+}
+
+function showAdminReply(reply, docId) {
+  const msgs = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = 'chat-msg admin-reply';
+  div.textContent = '👨‍🍳 ' + reply;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+  // Show notification dot if chat is closed
+  if(!document.getElementById('chatWindow').classList.contains('open')) {
+    document.getElementById('chatNotifDot').classList.add('show');
+    playNotificationSound();
+  }
+  // Mark as read
+  if(window._updateDoc && window._doc) {
+    try { _updateDoc(_doc(_db,'chats',docId), {userRead: true}); } catch(e){}
+  }
+}
+
+function playNotificationSound() {
+  try {
+    // Create a beep sound using AudioContext
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    [0, 150, 300].forEach(delay => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.frequency.value = 880;
+      gain.gain.setValueAtTime(0.4, ctx.currentTime + delay/1000);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay/1000 + 0.3);
+      osc.start(ctx.currentTime + delay/1000);
+      osc.stop(ctx.currentTime + delay/1000 + 0.3);
+    });
+  } catch(e) {}
+}
+
+window.toggleChat = function() {
+  const win = document.getElementById('chatWindow');
+  if(!win.classList.contains('open')) {
+    // Require profile before opening chat
+    requireProfile('চ্যাট করতে আপনার নাম ও মোবাইল নম্বর দিন।', function() {
+      win.classList.add('open');
+      document.getElementById('chatNotifDot').classList.remove('show');
+      document.getElementById('chatMessages').scrollTop = 9999;
+      // Show user name in chat header
+      const profile = getProfile();
+      if(profile) {
+        const statusEl = document.getElementById('chatStatus');
+        if(statusEl) statusEl.textContent = '● অনলাইন | ' + profile.name;
+      }
+    });
+  } else {
+    win.classList.remove('open');
+  }
+}
+
+window.sendChat = async function() {
+  const input = document.getElementById('chatInput');
+  const msg = input.value.trim(); if(!msg) return;
+  const msgs = document.getElementById('chatMessages');
+  msgs.innerHTML += `<div class="chat-msg user">${msg}</div>`;
+  input.value = '';
+  msgs.scrollTop = msgs.scrollHeight;
+
+  // Auto-reply for common questions
+  const autoReplies = {
+    'অর্ডার': 'অর্ডার করতে মেনু থেকে খাবার বেছে কার্টে যোগ করুন! 🛒',
+    'ডেলিভারি': `ডেলিভারি চার্জ ৳${settings.deliveryBase||40} থেকে শুরু। 🚚`,
+    'সময়': 'আমরা সাধারণত ৩০-৬০ মিনিটে ডেলিভারি দিই। ⏱️',
+    'bkash': `bKash: ${settings.bkash || 'N/A'} 📱`,
+    'nagad': `Nagad: ${settings.nagad || 'N/A'} 📱`,
+    'location': `আমাদের ঠিকানা: ${settings.address || 'লোড হচ্ছে...'} 📍`,
+  };
+  const key = Object.keys(autoReplies).find(k => msg.toLowerCase().includes(k.toLowerCase()));
+
+  // Save to Firebase for admin to see
+  try {
+    const profile = getProfile();
+    await _addDoc(_collection(_db, 'chats'), {
+      sessionId: chatSessionId,
+      userName: profile ? profile.name : 'অজানা',
+      userPhone: profile ? profile.phone : '',
+      message: msg,
+      timestamp: _serverTimestamp(),
+      adminReply: null,
+      userRead: true,
+      autoReplied: !!key
+    });
+  } catch(e) {}
+
+  // Show auto-reply if exists
+  if(key) {
+    document.getElementById('chatTyping').classList.add('show');
+    setTimeout(() => {
+      document.getElementById('chatTyping').classList.remove('show');
+      msgs.innerHTML += `<div class="chat-msg bot">${autoReplies[key]}</div>`;
+      msgs.scrollTop = msgs.scrollHeight;
+    }, 700);
+  } else {
+    document.getElementById('chatTyping').classList.add('show');
+    setTimeout(() => {
+      document.getElementById('chatTyping').classList.remove('show');
+      msgs.innerHTML += `<div class="chat-msg bot">আপনার মেসেজ পেয়েছি! Admin শীঘ্রই রিপ্লাই দেবেন। 😊</div>`;
+      msgs.scrollTop = msgs.scrollHeight;
+    }, 900);
+  }
+}
+
+// ===== TOAST =====
+window.showToast = function(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast show' + (type?' '+type:'');
+  setTimeout(() => t.className = 'toast', 3000);
+}
+</script>
+</body>
+</html>
