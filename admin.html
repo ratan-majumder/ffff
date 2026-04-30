@@ -757,37 +757,78 @@ window.deleteFood = async function(docId) {
 
 window.saveFood = async function() {
   const name = v('fName'); const category = v('fCategory'); const price = parseFloat(v('fPrice'));
-  if(!name||!category||isNaN(price)) { showToast('নাম, ক্যাটেগরি ও দাম দিন!'); return; }
-  let imgUrl = v('fImgUrl');
+  if(!name) { showToast('❌ খাবারের নাম দিন!'); return; }
+  if(!category) { showToast('❌ ক্যাটেগরি দিন!'); return; }
+  if(isNaN(price) || price <= 0) { showToast('❌ সঠিক দাম দিন!'); return; }
+
+  // Disable button to prevent double click
+  const saveBtn = document.querySelector('#foodModalBg .btn-primary');
+  if(saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'সেভ হচ্ছে...'; }
+
+  let imgUrl = v('fImgUrl') || '';
+
+  // Try image upload (skip if fails)
   if(foodImgBase64 && _storage) {
     try {
-      const r = _ref(_storage, 'foods/'+Date.now()+'.jpg');
+      showToast('ছবি আপলোড হচ্ছে...', '');
+      const r = _ref(_storage, 'foods/' + Date.now() + '.jpg');
       await _uploadString(r, foodImgBase64, 'data_url');
       imgUrl = await _getDownloadURL(r);
-    } catch(e) {}
+    } catch(e) {
+      // Storage might be restricted, continue without image
+      console.warn('Image upload failed:', e.message);
+    }
   }
+
   const variants = [];
   document.querySelectorAll('.vr-row').forEach(row=>{
-    const n=row.querySelector('.vr-name').value.trim();
-    const p=parseFloat(row.querySelector('.vr-price').value);
-    if(n&&!isNaN(p)) variants.push({name:n,price:p});
+    const n = row.querySelector('.vr-name').value.trim();
+    const p = parseFloat(row.querySelector('.vr-price').value);
+    if(n && !isNaN(p)) variants.push({name:n, price:p});
   });
+
   const data = {
-    name, category,
-    description: v('fDesc'), price,
-    discount: parseFloat(v('fDiscount'))||0,
-    tag: v('fTag'), image: imgUrl,
-    active: v('fActive')==='true',
-    variants, updatedAt: _serverTimestamp()
+    name,
+    category,
+    description: v('fDesc') || '',
+    price,
+    discount: parseFloat(v('fDiscount')) || 0,
+    tag: v('fTag') || '',
+    image: imgUrl,
+    active: v('fActive') === 'true',
+    variants,
+    updatedAt: _serverTimestamp()
   };
+
+  // Auth check
+  if(!_auth || !_auth.currentUser) {
+    showToast('❌ লগইন session শেষ! পেজ রিলোড করুন।', 'error');
+    if(saveBtn) { saveBtn.disabled=false; saveBtn.innerHTML='💾 সেভ করুন'; }
+    return;
+  }
+
   const docId = v('fId');
   try {
-    if(docId) { await _updateDoc(_doc(_db,'foods',docId), data); const i=allFoods.findIndex(f=>f._id===docId); if(i>-1)allFoods[i]={...allFoods[i],...data}; }
-    else { const ref=await _addDoc(_col(_db,'foods'),{...data,createdAt:_serverTimestamp()}); allFoods.push({_id:ref.id,...data}); }
-    renderFoods(); updateDashboard();
+    if(docId) {
+      await _updateDoc(_doc(_db, 'foods', docId), data);
+      const i = allFoods.findIndex(f => f._id === docId);
+      if(i > -1) allFoods[i] = {...allFoods[i], ...data, _id: docId};
+    } else {
+      const ref = await _addDoc(_col(_db, 'foods'), {...data, createdAt: _serverTimestamp()});
+      allFoods.push({_id: ref.id, ...data});
+    }
+    renderFoods();
+    updateDashboard();
     document.getElementById('foodModalBg').classList.remove('open');
     showToast('✅ আইটেম সেভ হয়েছে!', 'success');
-  } catch(e) { showToast('❌ সেভ করতে সমস্যা: '+e.message); }
+  } catch(e) {
+    console.error('saveFood error:', e);
+    let errMsg = e.message || e.code || 'Firebase error';
+    if((e.code||'').includes('permission')) errMsg = 'Permission denied! Firebase Rules চেক করুন।';
+    showToast('❌ ' + errMsg, 'error');
+  } finally {
+    if(saveBtn) { saveBtn.disabled = false; saveBtn.innerHTML = '💾 সেভ করুন'; }
+  }
 }
 
 window.handleFoodImg = function(input) {
@@ -874,7 +915,7 @@ window.saveBanner = async function() {
     renderBanners();
     document.getElementById('bannerModalBg').classList.remove('open');
     showToast('✅ ব্যানার সেভ হয়েছে!', 'success');
-  } catch(e) { showToast('❌ সেভ করতে সমস্যা'); }
+  } catch(e) { console.error('saveBanner error:',e); showToast('❌ সেভ সমস্যা: '+(e.message||e.code||'error'), 'error'); }
 }
 window.handleBannerImg = function(input) {
   const file = input.files[0]; if(!file) return;
@@ -947,7 +988,7 @@ window.saveNotice = async function() {
     renderNotices();
     document.getElementById('noticeModalBg').classList.remove('open');
     showToast('✅ নোটিশ সেভ হয়েছে!', 'success');
-  } catch(e) { showToast('❌ সেভ করতে সমস্যা'); }
+  } catch(e) { console.error('saveBanner error:',e); showToast('❌ সেভ সমস্যা: '+(e.message||e.code||'error'), 'error'); }
 }
 
 // ===== LIVE CHAT =====
@@ -1072,7 +1113,8 @@ function v(id) { return document.getElementById(id)?.value||''; }
 function sv(id, val) { const el=document.getElementById(id); if(el&&val!==undefined&&val!==null) el.value=val; }
 window.showToast = function(msg, type='') {
   const t=document.getElementById('toast'); t.textContent=msg; t.className='toast show'+(type?' '+type:'');
-  setTimeout(()=>t.className='toast',3200);
+  const dur = type==='error' ? 6000 : 3200;
+  setTimeout(()=>t.className='toast', dur);
 }
 </script>
 </body>
