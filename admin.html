@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kaliaff Admin Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #c0392b; --primary-dark: #922b21; --gold: #f39c12;
+  --dark: #1a0a00; --dark2: #2c1810; --light: #fff8f0;
+  --text: #3d1f0d; --text-light: #7a4f3a; --white: #ffffff;
+  --success: #27ae60; --warning: #f39c12; --info: #2980b9;
+  --sidebar-w: 240px; --radius: 12px;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Hind Siliguri',sans-serif; background:#f5f0eb; color:var(--text); min-height:100vh; }
+
+/* LOGIN */
+#loginScreen {
+  min-height:100vh; display:flex; align-items:center; justify-content:center;
+  background:linear-gradient(135deg,var(--dark),var(--dark2));
+}
+.login-box {
+  background:white; border-radius:20px; padding:40px;
+  width:min(380px,90vw); box-shadow:0 20px 60px rgba(0,0,0,0.3);
+}
+.login-logo { text-align:center; margin-bottom:26px; }
+.login-logo img { width:70px; height:70px; border-radius:50%; object-fit:cover; border:3px solid var(--gold); margin-bottom:10px; }
+.login-logo h2 { font-family:'Playfair Display',serif; font-size:1.8rem; color:var(--primary); }
+.login-logo p { color:var(--text-light); font-size:0.85rem; }
+.l-input { width:100%; padding:12px 14px; border:2px solid #eee; border-radius:var(--radius); font-family:inherit; font-size:0.95rem; outline:none; margin-bottom:11px; transition:border-color 0.2s; }
+.l-input:focus { border-color:var(--primary); }
+.l-btn { width:100%; padding:14px; background:var(--primary); color:white; border:none; border-radius:var(--radius); font-family:inherit; font-size:1rem; font-weight:700; cursor:pointer; transition:background 0.2s; }
+.l-btn:hover { background:var(--primary-dark); }
+.l-err { color:var(--primary); font-size:0.85rem; margin-bottom:8px; }
+
+/* LAYOUT */
+#adminApp { display:none; min-height:100vh; }
+.sidebar { position:fixed; left:0; top:0; bottom:0; width:var(--sidebar-w); background:var(--dark); overflow-y:auto; z-index:100; transition:transform 0.3s; }
+.sidebar-logo { padding:18px; border-bottom:1px solid rgba(255,255,255,0.1); }
+.sidebar-logo img { width:44px; height:44px; border-radius:50%; object-fit:cover; border:2px solid var(--gold); }
+.sidebar-logo h3 { font-family:'Playfair Display',serif; color:var(--gold); font-size:1.15rem; }
+.sidebar-logo p { color:#888; font-size:0.72rem; }
+.nav-item { display:flex; align-items:center; gap:9px; padding:12px 18px; color:#ccc; text-decoration:none; cursor:pointer; transition:all 0.2s; border:none; background:none; font-family:inherit; font-size:0.88rem; width:100%; }
+.nav-item:hover,.nav-item.active { background:rgba(192,57,43,0.2); color:white; }
+.nav-item.active { border-left:3px solid var(--primary); }
+.nav-icon { font-size:1.05rem; width:20px; text-align:center; }
+.nav-badge { margin-left:auto; background:var(--primary); color:white; border-radius:10px; padding:2px 7px; font-size:0.68rem; font-weight:700; }
+.nav-chat-badge { margin-left:auto; background:var(--gold); color:var(--dark); border-radius:10px; padding:2px 7px; font-size:0.68rem; font-weight:700; display:none; }
+.nav-chat-badge.show { display:inline-block; }
+
+.main-content { margin-left:var(--sidebar-w); min-height:100vh; padding:22px; background:#f5f0eb; }
+.topbar { display:flex; align-items:center; justify-content:space-between; margin-bottom:22px; background:white; padding:14px 20px; border-radius:var(--radius); box-shadow:0 2px 8px rgba(0,0,0,0.06); }
+.page-title { font-family:'Playfair Display',serif; font-size:1.25rem; }
+.logout-btn { background:var(--primary); color:white; border:none; border-radius:8px; padding:8px 14px; cursor:pointer; font-family:inherit; font-size:0.83rem; }
+
+/* SECTION */
+.section { display:none; }
+.section.active { display:block; }
+
+/* STATS */
+.stats-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(170px,1fr)); gap:14px; margin-bottom:22px; }
+.stat-card { background:white; border-radius:var(--radius); padding:18px; box-shadow:0 2px 8px rgba(0,0,0,0.06); border-left:4px solid var(--primary); }
+.stat-value { font-size:1.7rem; font-weight:700; }
+.stat-label { font-size:0.78rem; color:var(--text-light); margin-top:4px; }
+
+/* TABLE */
+.table-wrap { background:white; border-radius:var(--radius); overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,0.06); overflow-x:auto; }
+.table-head { display:flex; align-items:center; justify-content:space-between; padding:14px 18px; border-bottom:1px solid #eee; flex-wrap:wrap; gap:8px; }
+.table-head h4 { font-size:0.95rem; }
+table { width:100%; border-collapse:collapse; min-width:500px; }
+th { background:#f8f9fa; padding:9px 12px; font-size:0.78rem; color:#666; text-align:left; font-weight:600; }
+td { padding:11px 12px; font-size:0.83rem; border-bottom:1px solid #f0f0f0; vertical-align:middle; }
+tr:last-child td { border-bottom:none; }
+.food-thumb { width:44px; height:44px; border-radius:7px; object-fit:cover; }
+
+/* BADGE */
+.badge { padding:3px 9px; border-radius:9px; font-size:0.7rem; font-weight:700; }
+.badge-pending { background:#ffeaa7; color:#d35400; }
+.badge-confirmed { background:#dfe6e9; color:#636e72; }
+.badge-shipping { background:#74b9ff; color:#0984e3; }
+.badge-delivered { background:#55efc4; color:#00b894; }
+.badge-cancelled { background:#fab1a0; color:#d63031; }
+
+/* BTN */
+.btn { padding:7px 14px; border-radius:7px; border:none; cursor:pointer; font-family:inherit; font-size:0.83rem; font-weight:600; transition:all 0.2s; }
+.btn-primary { background:var(--primary); color:white; }
+.btn-primary:hover { background:var(--primary-dark); }
+.btn-success { background:var(--success); color:white; }
+.btn-warning { background:var(--warning); color:white; }
+.btn-danger { background:#e74c3c; color:white; }
+.btn-sm { padding:4px 9px; font-size:0.76rem; }
+.btn-icon { background:none; border:none; cursor:pointer; font-size:0.95rem; padding:3px 6px; border-radius:5px; }
+.btn-icon:hover { background:#f0f0f0; }
+
+/* MODAL */
+.modal-bg { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center; }
+.modal-bg.open { display:flex; }
+.modal-box { background:white; border-radius:18px; width:min(520px,95vw); max-height:90vh; overflow-y:auto; padding:26px; }
+.modal-title { font-family:'Playfair Display',serif; font-size:1.15rem; margin-bottom:18px; }
+.form-group { margin-bottom:13px; }
+.form-label { display:block; font-weight:600; font-size:0.83rem; margin-bottom:5px; }
+.form-input { width:100%; padding:9px 11px; border:2px solid #eee; border-radius:7px; font-family:inherit; font-size:0.88rem; outline:none; transition:border-color 0.2s; }
+.form-input:focus { border-color:var(--primary); }
+.form-row { display:grid; grid-template-columns:1fr 1fr; gap:11px; }
+.form-actions { display:flex; gap:9px; justify-content:flex-end; margin-top:18px; }
+.btn-cancel { background:#f0f0f0; color:var(--text); }
+
+/* IMG PREVIEW */
+.img-preview { width:100%; height:150px; object-fit:cover; border-radius:7px; margin-bottom:7px; display:none; }
+.img-upload { border:2px dashed #ddd; border-radius:7px; padding:18px; text-align:center; cursor:pointer; transition:border-color 0.2s; font-size:0.85rem; color:#aaa; }
+.img-upload:hover { border-color:var(--primary); }
+
+/* VARIANT */
+.variant-row { display:flex; gap:7px; align-items:center; margin-bottom:5px; }
+.variant-row input { flex:1; }
+.variant-add-btn { background:var(--success); color:white; border:none; border-radius:6px; padding:5px 9px; cursor:pointer; font-size:0.83rem; }
+.variant-del-btn { background:var(--primary); color:white; border:none; border-radius:6px; padding:5px 7px; cursor:pointer; }
+
+/* SETTINGS */
+.settings-card { background:white; border-radius:var(--radius); padding:22px; margin-bottom:18px; box-shadow:0 2px 8px rgba(0,0,0,0.06); }
+.settings-card h4 { font-size:0.95rem; margin-bottom:14px; color:var(--primary); border-bottom:2px solid #f5f0eb; padding-bottom:7px; }
+.settings-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:13px; }
+
+/* ORDER DETAIL */
+.order-detail-items { background:#f8f9fa; border-radius:7px; padding:11px; margin:10px 0; }
+.order-detail-item { display:flex; justify-content:space-between; padding:3px 0; font-size:0.88rem; }
+.status-select { padding:7px 11px; border:2px solid #eee; border-radius:7px; font-family:inherit; font-size:0.83rem; outline:none; cursor:pointer; }
+
+/* TOAST */
+.toast { position:fixed; top:20px; right:20px; z-index:9999; background:var(--dark); color:white; padding:11px 18px; border-radius:9px; font-size:0.88rem; box-shadow:0 8px 24px rgba(0,0,0,0.2); transform:translateX(200%); transition:transform 0.3s; max-width:90vw; }
+.toast.show { transform:translateX(0); }
+.toast.success { border-left:4px solid var(--success); }
+.toast.error { border-left:4px solid var(--primary); }
+
+/* RESPONSIVE */
+@media(max-width:768px) {
+  .sidebar { transform:translateX(-100%); }
+  .sidebar.open { transform:translateX(0); }
+  .main-content { margin-left:0; padding:14px; }
+  .mob-menu-btn { display:flex !important; }
+  .form-row { grid-template-columns:1fr; }
+  .stats-grid { grid-template-columns:repeat(2,1fr); }
+}
+.mob-menu-btn { display:none; background:none; border:none; font-size:1.3rem; cursor:pointer; }
+
+/* BANNER FORM */
+.banner-preview { width:100%; height:90px; object-fit:cover; border-radius:7px; display:none; margin-bottom:7px; }
+
+/* LOADING */
+.tbl-loading { text-align:center; padding:36px; color:#aaa; }
+.spinner { width:34px; height:34px; border:3px solid #eee; border-top-color:var(--primary); border-radius:50%; animation:spin 0.8s linear infinite; margin:0 auto 10px; }
+@keyframes spin { to{transform:rotate(360deg)} }
+.empty-table { text-align:center; padding:36px; color:#aaa; font-size:0.88rem; }
+select.form-input { appearance:auto; }
+
+/* NOTICE BOARD SECTION */
+.notice-item-card {
+  background:white; border-radius:var(--radius); padding:14px 18px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.06); margin-bottom:10px;
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+}
+.notice-text { flex:1; font-size:0.88rem; }
+.notice-badge { background: linear-gradient(90deg,#c0392b,#f39c12); color:white; padding:3px 9px; border-radius:9px; font-size:0.7rem; font-weight:700; flex-shrink:0; }
+
+/* CHAT SECTION */
+.chat-list { max-height:500px; overflow-y:auto; }
+.chat-card {
+  background:white; border-radius:var(--radius); margin-bottom:10px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.06); overflow:hidden;
+}
+.chat-card-header {
+  padding:10px 14px; background:#f8f9fa;
+  display:flex; align-items:center; justify-content:space-between;
+  border-bottom:1px solid #eee;
+}
+.chat-session-id { font-size:0.78rem; color:#aaa; font-family:monospace; }
+.chat-card-body { padding:14px; }
+.chat-bubble {
+  max-width:80%; padding:8px 12px; border-radius:11px;
+  font-size:0.83rem; line-height:1.4; margin-bottom:7px;
+}
+.chat-bubble.user-msg { background:#f5f0eb; margin-right:auto; }
+.chat-bubble.admin-msg { background:var(--dark); color:#f8c471; margin-left:auto; }
+.chat-reply-area { display:flex; gap:7px; margin-top:10px; }
+.chat-reply-input { flex:1; padding:8px 11px; border:2px solid #eee; border-radius:20px; font-family:inherit; font-size:0.83rem; outline:none; }
+.chat-reply-input:focus { border-color:var(--primary); }
+.chat-reply-btn { background:var(--primary); color:white; border:none; border-radius:20px; padding:8px 14px; cursor:pointer; font-family:inherit; font-size:0.83rem; font-weight:600; white-space:nowrap; }
+.new-chat-badge { background:var(--gold); color:var(--dark); font-size:0.65rem; font-weight:700; padding:2px 7px; border-radius:8px; }
+</style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">
+      <img src="kaliaff.jpg" alt="Kaliaff" onerror="this.style.display='none'">
+      <h2>🍽️ Kaliaff</h2>
+      <p>Admin Panel — শুধুমাত্র অ্যাডমিনের জন্য</p>
+    </div>
+    <div id="loginErr" class="l-err" style="display:none;"></div>
+    <input class="l-input" type="email" id="loginEmail" placeholder="অ্যাডমিন ইমেইল">
+    <input class="l-input" type="password" id="loginPass" placeholder="পাসওয়ার্ড" onkeypress="if(event.key==='Enter')doLogin()">
+    <button class="l-btn" onclick="doLogin()">লগইন করুন →</button>
+  </div>
+</div>
+
+<!-- ADMIN APP -->
+<div id="adminApp">
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <img src="kaliaff.jpg" alt="K" onerror="this.style.display='none'">
+      <h3>Kaliaff</h3>
+      <p>Admin Panel</p>
+    </div>
+    <button class="nav-item active" onclick="showSection('dashboard')"><span class="nav-icon">📊</span>ড্যাশবোর্ড</button>
+    <button class="nav-item" onclick="showSection('orders')"><span class="nav-icon">📦</span>অর্ডার <span class="nav-badge" id="pendingBadge">0</span></button>
+    <button class="nav-item" onclick="showSection('foods')"><span class="nav-icon">🍛</span>মেনু ম্যানেজ</button>
+    <button class="nav-item" onclick="showSection('banners')"><span class="nav-icon">🖼️</span>ব্যানার</button>
+    <button class="nav-item" onclick="showSection('notices')"><span class="nav-icon">📢</span>নোটিশ বোর্ড</button>
+    <button class="nav-item" onclick="showSection('chats')"><span class="nav-icon">💬</span>লাইভ চ্যাট <span class="nav-chat-badge" id="newChatBadge">নতুন</span></button>
+    <button class="nav-item" onclick="showSection('settings')"><span class="nav-icon">⚙️</span>সেটিংস</button>
+  </div>
+
+  <div class="main-content">
+    <div class="topbar">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <button class="mob-menu-btn" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+        <span class="page-title" id="pageTitle">ড্যাশবোর্ড</span>
+      </div>
+      <button class="logout-btn" onclick="doLogout()">লগআউট</button>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div class="section active" id="secDashboard">
+      <div class="stats-grid">
+        <div class="stat-card" style="border-color:#c0392b;"><div class="stat-value" id="statTotal">0</div><div class="stat-label">মোট অর্ডার</div></div>
+        <div class="stat-card" style="border-color:#f39c12;"><div class="stat-value" id="statPending">0</div><div class="stat-label">পেন্ডিং অর্ডার</div></div>
+        <div class="stat-card" style="border-color:#27ae60;"><div class="stat-value" id="statDelivered">0</div><div class="stat-label">ডেলিভার্ড</div></div>
+        <div class="stat-card" style="border-color:#2980b9;"><div class="stat-value" id="statRevenue">৳0</div><div class="stat-label">মোট আয়</div></div>
+        <div class="stat-card" style="border-color:#8e44ad;"><div class="stat-value" id="statFoods">0</div><div class="stat-label">মোট আইটেম</div></div>
+      </div>
+      <div class="table-wrap">
+        <div class="table-head"><h4>সাম্প্রতিক অর্ডার</h4><button class="btn btn-primary btn-sm" onclick="showSection('orders')">সব দেখুন</button></div>
+        <table><thead><tr><th>অর্ডার ID</th><th>নাম</th><th>মোট</th><th>স্ট্যাটাস</th></tr></thead>
+        <tbody id="recentOrdersBody"><tr><td colspan="4" class="tbl-loading"><div class="spinner"></div></td></tr></tbody></table>
+      </div>
+    </div>
+
+    <!-- ORDERS -->
+    <div class="section" id="secOrders">
+      <div class="table-wrap">
+        <div class="table-head">
+          <h4>সব অর্ডার</h4>
+          <select class="form-input" style="width:auto;padding:6px 9px;" onchange="filterOrders(this.value)">
+            <option value="all">সব</option>
+            <option value="pending">পেন্ডিং</option>
+            <option value="confirmed">নিশ্চিত</option>
+            <option value="shipping">ডেলিভারিতে</option>
+            <option value="delivered">ডেলিভার্ড</option>
+          </select>
+        </div>
+        <table>
+          <thead><tr><th>ID</th><th>নাম / ফোন</th><th>আইটেম</th><th>মোট</th><th>স্ট্যাটাস</th><th>পেমেন্ট</th><th>অ্যাকশন</th></tr></thead>
+          <tbody id="ordersBody"><tr><td colspan="7" class="tbl-loading"><div class="spinner"></div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- FOODS -->
+    <div class="section" id="secFoods">
+      <div class="table-wrap">
+        <div class="table-head">
+          <h4>মেনু আইটেম</h4>
+          <button class="btn btn-primary" onclick="openFoodModal()">+ নতুন আইটেম</button>
+        </div>
+        <table>
+          <thead><tr><th>ছবি</th><th>নাম</th><th>ক্যাটেগরি</th><th>দাম</th><th>ডিসকাউন্ট</th><th>স্ট্যাটাস</th><th>লিংক</th><th>অ্যাকশন</th></tr></thead>
+          <tbody id="foodsBody"><tr><td colspan="8" class="tbl-loading"><div class="spinner"></div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- BANNERS -->
+    <div class="section" id="secBanners">
+      <div style="margin-bottom:14px;">
+        <button class="btn btn-primary" onclick="openBannerModal()">+ নতুন ব্যানার</button>
+      </div>
+      <div class="table-wrap">
+        <div class="table-head"><h4>ব্যানার লিস্ট</h4></div>
+        <table>
+          <thead><tr><th>টাইটেল</th><th>ব্যাজ</th><th>প্রোডাক্ট লিংক</th><th>রং</th><th>অ্যাকশন</th></tr></thead>
+          <tbody id="bannersBody"><tr><td colspan="5" class="tbl-loading"><div class="spinner"></div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- NOTICE BOARD -->
+    <div class="section" id="secNotices">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <h4 style="font-size:1rem;font-weight:700;">📢 নোটিশ বোর্ড</h4>
+        <button class="btn btn-primary" onclick="openNoticeModal()">+ নতুন নোটিশ</button>
+      </div>
+      <div id="noticesList">
+        <div class="tbl-loading"><div class="spinner"></div></div>
+      </div>
+    </div>
+
+    <!-- LIVE CHAT -->
+    <div class="section" id="secChats">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <h4 style="font-size:1rem;font-weight:700;">💬 লাইভ চ্যাট</h4>
+        <button class="btn btn-sm" style="background:#f0f0f0;" onclick="loadChats()">🔄 রিফ্রেশ</button>
+      </div>
+      <div class="chat-list" id="chatList">
+        <div class="tbl-loading"><div class="spinner"></div></div>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="section" id="secSettings">
+      <div class="settings-card">
+        <h4>🏪 রেস্তোরাঁ তথ্য</h4>
+        <div class="settings-grid">
+          <div class="form-group"><label class="form-label">রেস্তোরাঁর নাম</label><input class="form-input" id="sSiteName" placeholder="Kaliaff"></div>
+          <div class="form-group"><label class="form-label">ফোন নম্বর</label><input class="form-input" id="sPhone" placeholder="01XXXXXXXXX"></div>
+          <div class="form-group" style="grid-column:1/-1;"><label class="form-label">ঠিকানা</label><input class="form-input" id="sAddress" placeholder="সম্পূর্ণ ঠিকানা"></div>
+          <div class="form-group" style="grid-column:1/-1;"><label class="form-label">📍 Google Maps লিংক (দোকানের লোকেশন)</label><input class="form-input" id="sLocationLink" placeholder="https://maps.google.com/?q=..."></div>
+        </div>
+      </div>
+      <div class="settings-card">
+        <h4>📱 পেমেন্ট নম্বর</h4>
+        <div class="settings-grid">
+          <div class="form-group"><label class="form-label">bKash নম্বর</label><input class="form-input" id="sBkash" placeholder="01XXXXXXXXX"></div>
+          <div class="form-group"><label class="form-label">Nagad নম্বর</label><input class="form-input" id="sNagad" placeholder="01XXXXXXXXX"></div>
+        </div>
+      </div>
+      <div class="settings-card">
+        <h4>🚚 ডেলিভারি চার্জ</h4>
+        <div class="settings-grid">
+          <div class="form-group"><label class="form-label">বেস চার্জ (৳)</label><input class="form-input" id="sDeliveryBase" placeholder="40" type="number"></div>
+          <div class="form-group"><label class="form-label">প্রতি কিমি চার্জ (৳)</label><input class="form-input" id="sDeliveryPerKm" placeholder="0" type="number"></div>
+        </div>
+      </div>
+      <div class="settings-card">
+        <h4>🌐 সোশ্যাল লিংক</h4>
+        <div class="settings-grid">
+          <div class="form-group"><label class="form-label">Facebook লিংক</label><input class="form-input" id="sFbLink" placeholder="https://fb.com/..."></div>
+          <div class="form-group"><label class="form-label">WhatsApp নম্বর</label><input class="form-input" id="sWaNumber" placeholder="880XXXXXXXXXX"></div>
+          <div class="form-group"><label class="form-label">ইমেইল</label><input class="form-input" id="sEmail" placeholder="admin@kaliaff.com"></div>
+        </div>
+      </div>
+      <div class="settings-card">
+        <h4>🔑 অ্যাডমিন লগইন পরিবর্তন</h4>
+        <div class="settings-grid">
+          <div class="form-group"><label class="form-label">নতুন ইমেইল</label><input class="form-input" id="sAdminEmail" type="email" placeholder="admin@kaliaff.com"></div>
+          <div class="form-group"><label class="form-label">নতুন পাসওয়ার্ড</label><input class="form-input" id="sAdminPass" type="password" placeholder="নতুন পাসওয়ার্ড"></div>
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="saveSettings()" style="width:100%;padding:13px;font-size:0.95rem;">💾 সেটিংস সেভ করুন</button>
+    </div>
+  </div>
+</div>
+
+<!-- FOOD MODAL -->
+<div class="modal-bg" id="foodModalBg" onclick="closeModal('foodModalBg',event)">
+  <div class="modal-box">
+    <div class="modal-title" id="foodModalTitle">নতুন খাবার যোগ করুন</div>
+    <input type="hidden" id="fId">
+    <div class="form-group">
+      <label class="form-label">খাবারের ছবি</label>
+      <img class="img-preview" id="fImgPreview" src="" alt="">
+      <div class="img-upload" onclick="document.getElementById('fImgInput').click()">📸 ছবি আপলোড করুন
+        <input type="file" id="fImgInput" accept="image/*" style="display:none" onchange="handleFoodImg(this)">
+      </div>
+      <input class="form-input" id="fImgUrl" placeholder="অথবা ছবির URL দিন" style="margin-top:7px;" oninput="previewImgUrl(this.value)">
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">নাম *</label><input class="form-input" id="fName" placeholder="খাবারের নাম"></div>
+      <div class="form-group"><label class="form-label">ক্যাটেগরি *</label><input class="form-input" id="fCategory" placeholder="Deshi / Pizza / Burger..."></div>
+    </div>
+    <div class="form-group"><label class="form-label">বিবরণ</label><textarea class="form-input" id="fDesc" rows="2" placeholder="খাবারের বিস্তারিত..."></textarea></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">মূল দাম (৳) *</label><input class="form-input" id="fPrice" type="number" placeholder="0"></div>
+      <div class="form-group"><label class="form-label">ডিসকাউন্ট (%)</label><input class="form-input" id="fDiscount" type="number" placeholder="0" min="0" max="100"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">ট্যাগ (যেমন: New, Hot)</label><input class="form-input" id="fTag" placeholder="Hot 🔥"></div>
+      <div class="form-group"><label class="form-label">স্ট্যাটাস</label>
+        <select class="form-input" id="fActive"><option value="true">সক্রিয়</option><option value="false">নিষ্ক্রিয়</option></select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">ভেরিয়েন্ট (সাইজ/পরিমাণ)</label>
+      <div id="variantsList"></div>
+      <button type="button" class="variant-add-btn" onclick="addVariantRow()">+ ভেরিয়েন্ট যোগ করুন</button>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-cancel" onclick="document.getElementById('foodModalBg').classList.remove('open')">বাতিল</button>
+      <button class="btn btn-primary" onclick="saveFood()">💾 সেভ করুন</button>
+    </div>
+  </div>
+</div>
+
+<!-- BANNER MODAL -->
+<div class="modal-bg" id="bannerModalBg" onclick="closeModal('bannerModalBg',event)">
+  <div class="modal-box">
+    <div class="modal-title" id="bannerModalTitle">নতুন ব্যানার</div>
+    <input type="hidden" id="bId">
+    <div class="form-group">
+      <label class="form-label">ব্যানার ছবি (ঐচ্ছিক)</label>
+      <img class="banner-preview" id="bImgPreview" src="" alt="">
+      <div class="img-upload" onclick="document.getElementById('bImgInput').click()">📸 ব্যানার ছবি আপলোড করুন
+        <input type="file" id="bImgInput" accept="image/*" style="display:none" onchange="handleBannerImg(this)">
+      </div>
+    </div>
+    <div class="form-group"><label class="form-label">টাইটেল *</label><input class="form-input" id="bTitle" placeholder="স্পেশাল অফার!"></div>
+    <div class="form-group"><label class="form-label">সাবটাইটেল</label><input class="form-input" id="bSubtitle" placeholder="বিস্তারিত..."></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">ব্যাজ টেক্সট</label><input class="form-input" id="bBadge" placeholder="🔥 আজকের অফার"></div>
+      <div class="form-group"><label class="form-label">CTA বাটন</label><input class="form-input" id="bCta" placeholder="অর্ডার করুন →"></div>
+    </div>
+    <div class="form-group"><label class="form-label">🔗 প্রোডাক্ট লিংক (ঐচ্ছিক)</label><input class="form-input" id="bProductLink" placeholder="https://yoursite.com/?product=..."></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">ইমোজি</label><input class="form-input" id="bEmoji" placeholder="🍛"></div>
+      <div class="form-group"><label class="form-label">ব্যাকগ্রাউন্ড</label><input class="form-input" id="bBgColor" placeholder="linear-gradient(135deg,#1a0a00,#c0392b)"></div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-cancel" onclick="document.getElementById('bannerModalBg').classList.remove('open')">বাতিল</button>
+      <button class="btn btn-primary" onclick="saveBanner()">💾 সেভ করুন</button>
+    </div>
+  </div>
+</div>
+
+<!-- ORDER DETAIL MODAL -->
+<div class="modal-bg" id="orderModalBg" onclick="closeModal('orderModalBg',event)">
+  <div class="modal-box">
+    <div class="modal-title">📦 অর্ডার বিস্তারিত</div>
+    <div id="orderDetailContent"></div>
+    <div class="form-actions">
+      <button class="btn btn-cancel" onclick="document.getElementById('orderModalBg').classList.remove('open')">বন্ধ করুন</button>
+      <button class="btn btn-primary" onclick="updateOrderStatus()">স্ট্যাটাস আপডেট করুন</button>
+    </div>
+  </div>
+</div>
+
+<!-- NOTICE MODAL -->
+<div class="modal-bg" id="noticeModalBg" onclick="closeModal('noticeModalBg',event)">
+  <div class="modal-box" style="max-width:420px;">
+    <div class="modal-title">📢 নতুন নোটিশ</div>
+    <input type="hidden" id="noticeId">
+    <div class="form-group">
+      <label class="form-label">নোটিশ টেক্সট *</label>
+      <textarea class="form-input" id="noticeText" rows="3" placeholder="যেমন: আজ দোকান বন্ধ থাকবে। কাল থেকে আবার খোলা হবে।"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">স্ট্যাটাস</label>
+      <select class="form-input" id="noticeActive">
+        <option value="true">সক্রিয় (দেখা যাবে)</option>
+        <option value="false">নিষ্ক্রিয় (লুকানো)</option>
+      </select>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-cancel" onclick="document.getElementById('noticeModalBg').classList.remove('open')">বাতিল</button>
+      <button class="btn btn-primary" onclick="saveNotice()">💾 সেভ করুন</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- FIREBASE -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs, doc, getDoc, setDoc, updateDoc, deleteDoc, query, orderBy, where, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateEmail, updatePassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getStorage, ref, uploadString, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCNNDZZddVghLpD8y6CVhKj2ZH3HAHYAzI",
+  authDomain: "kaliaff.firebaseapp.com",
+  projectId: "kaliaff",
+  storageBucket: "kaliaff.firebasestorage.app",
+  messagingSenderId: "193034886013",
+  appId: "1:193034886013:web:66b5e0571a4d9aec704a14",
+  measurementId: "G-L87LV3EBT6"
+};
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+const storage = getStorage(app);
+
+window._db = db; window._auth = auth; window._storage = storage;
+window._col = collection; window._addDoc = addDoc; window._getDocs = getDocs;
+window._doc = doc; window._getDoc = getDoc; window._setDoc = setDoc;
+window._updateDoc = updateDoc; window._deleteDoc = deleteDoc;
+window._query = query; window._orderBy = orderBy; window._where = where;
+window._serverTimestamp = serverTimestamp;
+window._signIn = signInWithEmailAndPassword;
+window._signOut = signOut;
+window._updateEmail = updateEmail;
+window._updatePassword = updatePassword;
+window._ref = ref; window._uploadString = uploadString; window._getDownloadURL = getDownloadURL;
+window._onSnapshot = onSnapshot;
+
+onAuthStateChanged(auth, user => {
+  if(user) {
+    document.getElementById('loginScreen').style.display='none';
+    document.getElementById('adminApp').style.display='block';
+    initAdmin();
+  } else {
+    document.getElementById('loginScreen').style.display='flex';
+    document.getElementById('adminApp').style.display='none';
+  }
+});
+</script>
+
+<script>
+// ===== LOGIN =====
+window.doLogin = async function() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass = document.getElementById('loginPass').value;
+  const err = document.getElementById('loginErr');
+  err.style.display = 'none';
+  if(!email||!pass) { err.textContent='ইমেইল ও পাসওয়ার্ড দিন'; err.style.display='block'; return; }
+  try {
+    await _signIn(_auth, email, pass);
+  } catch(e) {
+    err.textContent = 'ইমেইল বা পাসওয়ার্ড ভুল!';
+    err.style.display = 'block';
+  }
+}
+
+window.doLogout = async function() {
+  if(confirm('লগআউট করবেন?')) await _signOut(_auth);
+}
+
+// ===== INIT =====
+let allOrders = [], allFoods = [], allBanners = [], allNotices = [], settings = {};
+let currentOrderId = null, currentOrderDocId = null;
+let foodImgBase64 = null, bannerImgBase64 = null;
+let chatUnsubscribe = null;
+
+async function initAdmin() {
+  await loadSettings();
+  await loadOrders();
+  await loadFoods();
+  await loadBanners();
+  await loadNotices();
+  updateDashboard();
+  listenForNewChats();
+}
+
+// ===== SETTINGS =====
+async function loadSettings() {
+  try {
+    const snap = await _getDocs(_col(_db,'settings'));
+    settings = {};
+    snap.forEach(d => { settings = {...settings, ...d.data(), _id:d.id}; });
+    fillSettings();
+  } catch(e){}
+}
+
+function fillSettings() {
+  const f = (id,val) => { const el=document.getElementById(id); if(el&&val!==undefined&&val!==null) el.value=val; };
+  f('sSiteName',settings.siteName); f('sPhone',settings.phone); f('sAddress',settings.address);
+  f('sBkash',settings.bkash); f('sNagad',settings.nagad);
+  f('sDeliveryBase',settings.deliveryBase); f('sDeliveryPerKm',settings.deliveryPerKm);
+  f('sFbLink',settings.fbLink); f('sWaNumber',settings.waNumber); f('sEmail',settings.email);
+  f('sLocationLink',settings.locationLink);
+}
+
+window.saveSettings = async function() {
+  const data = {
+    siteName: v('sSiteName'), phone: v('sPhone'), address: v('sAddress'),
+    bkash: v('sBkash'), nagad: v('sNagad'),
+    deliveryBase: v('sDeliveryBase'), deliveryPerKm: v('sDeliveryPerKm'),
+    fbLink: v('sFbLink'), waNumber: v('sWaNumber'), email: v('sEmail'),
+    locationLink: v('sLocationLink')
+  };
+  try {
+    if(settings._id) { await _updateDoc(_doc(_db,'settings',settings._id), data); }
+    else { await _addDoc(_col(_db,'settings'), data); }
+    const newEmail = v('sAdminEmail'); const newPass = v('sAdminPass');
+    if(newEmail && _auth.currentUser) { try{ await _updateEmail(_auth.currentUser, newEmail); }catch(e){} }
+    if(newPass && _auth.currentUser) { try{ await _updatePassword(_auth.currentUser, newPass); }catch(e){} }
+    showToast('✅ সেটিংস সেভ হয়েছে!', 'success');
+  } catch(e) { showToast('❌ সেভ করতে সমস্যা হয়েছে'); }
+}
+
+// ===== ORDERS =====
+async function loadOrders() {
+  try {
+    const snap = await _getDocs(_col(_db,'orders'));
+    allOrders = [];
+    snap.forEach(d => allOrders.push({_id:d.id, ...d.data()}));
+    allOrders.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
+    renderOrders(allOrders); renderRecentOrders(); updatePendingBadge();
+  } catch(e) { document.getElementById('ordersBody').innerHTML = '<tr><td colspan="7" class="empty-table">লোড সমস্যা</td></tr>'; }
+}
+
+function updatePendingBadge() {
+  const p = allOrders.filter(o=>o.status==='pending').length;
+  document.getElementById('pendingBadge').textContent = p;
+}
+
+window.filterOrders = function(status) {
+  const filtered = status==='all' ? allOrders : allOrders.filter(o=>o.status===status);
+  renderOrders(filtered);
+}
+
+function renderOrders(orders) {
+  const statusLabel = {pending:'পেন্ডিং',confirmed:'নিশ্চিত',shipping:'ডেলিভারিতে',delivered:'ডেলিভার্ড',cancelled:'বাতিল'};
+  document.getElementById('ordersBody').innerHTML = !orders.length
+    ? '<tr><td colspan="7" class="empty-table">কোনো অর্ডার নেই</td></tr>'
+    : orders.map(o=>`
+      <tr>
+        <td><b>${o.orderId||'-'}</b></td>
+        <td>${o.name}<br><small style="color:#aaa">${o.phone}</small></td>
+        <td style="max-width:130px;font-size:0.76rem;">${(o.items||[]).map(i=>i.name).join(', ')}</td>
+        <td><b>৳${o.total||0}</b></td>
+        <td><span class="badge badge-${o.status||'pending'}">${statusLabel[o.status]||o.status}</span></td>
+        <td><small style="color:#aaa">${o.payment==='cod'?'COD':'Advance'}${o.trxId?' | '+o.trxId:''}</small>${o.ssUrl?`<br><a href="${o.ssUrl}" target="_blank" style="color:var(--info);font-size:0.72rem;">SS দেখুন</a>`:''}</td>
+        <td><button class="btn btn-sm btn-primary" onclick="openOrderDetail('${o._id}')">বিস্তারিত</button></td>
+      </tr>`).join('');
+}
+
+function renderRecentOrders() {
+  const recent = allOrders.slice(0,5);
+  const statusLabel = {pending:'পেন্ডিং',confirmed:'নিশ্চিত',shipping:'ডেলিভারিতে',delivered:'ডেলিভার্ড'};
+  document.getElementById('recentOrdersBody').innerHTML = !recent.length
+    ? '<tr><td colspan="4" class="empty-table">কোনো অর্ডার নেই</td></tr>'
+    : recent.map(o=>`<tr><td><b>${o.orderId||'-'}</b></td><td>${o.name}</td><td>৳${o.total||0}</td><td><span class="badge badge-${o.status||'pending'}">${statusLabel[o.status]||o.status}</span></td></tr>`).join('');
+}
+
+window.openOrderDetail = function(docId) {
+  const o = allOrders.find(x=>x._id===docId); if(!o) return;
+  currentOrderDocId = docId; currentOrderId = o.orderId;
+  const statusLabel = {pending:'পেন্ডিং',confirmed:'নিশ্চিত',shipping:'ডেলিভারিতে',delivered:'ডেলিভার্ড',cancelled:'বাতিল'};
+  document.getElementById('orderDetailContent').innerHTML = `
+    <div style="background:#f8f9fa;border-radius:8px;padding:13px;margin-bottom:11px;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:5px;"><b>অর্ডার ID:</b><span>${o.orderId}</span></div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:5px;"><b>নাম:</b><span>${o.name}</span></div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:5px;"><b>ফোন:</b><span>${o.phone}</span></div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:5px;"><b>ঠিকানা:</b><span style="text-align:right;max-width:55%;font-size:0.85rem;">${o.address}</span></div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:5px;"><b>পেমেন্ট:</b><span>${o.payment==='cod'?'💵 COD':'📱 Advance'}</span></div>
+      ${o.trxId?`<div style="display:flex;justify-content:space-between;margin-bottom:5px;"><b>TRX ID:</b><span>${o.trxId}</span></div>`:''}
+      ${o.ssUrl?`<div style="margin-top:7px;"><a href="${o.ssUrl}" target="_blank"><img src="${o.ssUrl}" style="width:100%;border-radius:7px;max-height:140px;object-fit:contain;"></a></div>`:''}
+    </div>
+    <div class="order-detail-items">
+      ${(o.items||[]).map(i=>`<div class="order-detail-item"><span>${i.name}${i.variant?' ('+i.variant+')':''} x${i.qty}</span><span>৳${i.price*i.qty}</span></div>`).join('')}
+      <div class="order-detail-item" style="border-top:1px solid #ddd;padding-top:5px;"><span>ডেলিভারি</span><span>৳${o.delivery||0}</span></div>
+      <div class="order-detail-item" style="font-weight:700;font-size:0.95rem;"><span>মোট</span><span>৳${o.total||0}</span></div>
+    </div>
+    ${o.note?`<p style="font-size:0.83rem;color:#666;margin-bottom:11px;">📝 ${o.note}</p>`:''}
+    <div class="form-group">
+      <label class="form-label">স্ট্যাটাস পরিবর্তন করুন:</label>
+      <select class="status-select form-input" id="orderStatusSelect">
+        <option value="pending" ${o.status==='pending'?'selected':''}>📋 পেন্ডিং</option>
+        <option value="confirmed" ${o.status==='confirmed'?'selected':''}>✅ নিশ্চিত</option>
+        <option value="shipping" ${o.status==='shipping'?'selected':''}>🚚 ডেলিভারিতে</option>
+        <option value="delivered" ${o.status==='delivered'?'selected':''}>🎉 ডেলিভার্ড</option>
+        <option value="cancelled" ${o.status==='cancelled'?'selected':''}>❌ বাতিল</option>
+      </select>
+    </div>`;
+  document.getElementById('orderModalBg').classList.add('open');
+}
+
+window.updateOrderStatus = async function() {
+  const newStatus = document.getElementById('orderStatusSelect').value;
+  try {
+    await _updateDoc(_doc(_db,'orders',currentOrderDocId), {status: newStatus});
+    const ord = allOrders.find(o=>o._id===currentOrderDocId);
+    if(ord) ord.status = newStatus;
+    renderOrders(allOrders); renderRecentOrders(); updatePendingBadge(); updateDashboard();
+    document.getElementById('orderModalBg').classList.remove('open');
+    showToast('✅ স্ট্যাটাস আপডেট হয়েছে!', 'success');
+  } catch(e) { showToast('❌ আপডেট করতে সমস্যা'); }
+}
+
+// ===== FOODS =====
+async function loadFoods() {
+  try {
+    const snap = await _getDocs(_col(_db,'foods'));
+    allFoods = [];
+    snap.forEach(d => allFoods.push({_id:d.id, ...d.data()}));
+    renderFoods();
+  } catch(e) {}
+}
+
+function renderFoods() {
+  document.getElementById('foodsBody').innerHTML = !allFoods.length
+    ? '<tr><td colspan="8" class="empty-table">কোনো আইটেম নেই</td></tr>'
+    : allFoods.map(f=>{
+      const siteUrl = window.location.origin + window.location.pathname.replace('admin.html','index.html');
+      const productUrl = siteUrl + '?product=' + f._id;
+      return `<tr>
+        <td><img class="food-thumb" src="${f.image||'https://via.placeholder.com/44x44/c0392b/white?text=F'}" onerror="this.src='https://via.placeholder.com/44x44'"></td>
+        <td><b>${f.name}</b>${f.tag?`<span class="badge" style="background:#ffeaa7;color:#d35400;margin-left:5px;">${f.tag}</span>`:''}</td>
+        <td>${f.category||'-'}</td>
+        <td>৳${f.price||0}</td>
+        <td>${f.discount?f.discount+'%':'—'}</td>
+        <td><span class="badge ${f.active!==false?'badge-delivered':'badge-cancelled'}">${f.active!==false?'সক্রিয়':'বন্ধ'}</span></td>
+        <td>
+          <button class="btn btn-sm" style="background:#f0f0f0;" onclick="copyFoodLink('${productUrl}')">🔗 কপি</button>
+        </td>
+        <td>
+          <button class="btn-icon" onclick="editFood('${f._id}')">✏️</button>
+          <button class="btn-icon" onclick="deleteFood('${f._id}')">🗑️</button>
+        </td>
+      </tr>`;
+    }).join('');
+}
+
+window.copyFoodLink = function(url) {
+  navigator.clipboard.writeText(url).then(() => showToast('✅ লিংক কপি হয়েছে!', 'success')).catch(() => {
+    const el = document.createElement('textarea'); el.value = url;
+    document.body.appendChild(el); el.select(); document.execCommand('copy');
+    document.body.removeChild(el); showToast('✅ লিংক কপি হয়েছে!', 'success');
+  });
+}
+
+window.openFoodModal = function(docId) {
+  foodImgBase64 = null;
+  document.getElementById('fId').value = docId || '';
+  document.getElementById('foodModalTitle').textContent = docId ? 'খাবার এডিট করুন' : 'নতুন খাবার যোগ করুন';
+  ['fName','fCategory','fDesc','fPrice','fDiscount','fTag','fImgUrl'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('fActive').value='true';
+  document.getElementById('fImgPreview').style.display='none';
+  document.getElementById('variantsList').innerHTML='';
+  document.getElementById('foodModalBg').classList.add('open');
+}
+
+window.editFood = function(docId) {
+  const f = allFoods.find(x=>x._id===docId); if(!f) return;
+  openFoodModal(docId);
+  setTimeout(()=>{
+    sv('fName',f.name); sv('fCategory',f.category); sv('fDesc',f.description);
+    sv('fPrice',f.price); sv('fDiscount',f.discount); sv('fTag',f.tag);
+    sv('fImgUrl',f.image); sv('fActive',f.active!==false?'true':'false');
+    if(f.image) { const p=document.getElementById('fImgPreview'); p.src=f.image; p.style.display='block'; }
+    if(f.variants&&f.variants.length) f.variants.forEach(vv=>addVariantRow(vv.name, vv.price));
+  },50);
+}
+
+window.deleteFood = async function(docId) {
+  if(!confirm('এই আইটেমটি মুছবেন?')) return;
+  try {
+    await _deleteDoc(_doc(_db,'foods',docId));
+    allFoods = allFoods.filter(f=>f._id!==docId);
+    renderFoods(); updateDashboard();
+    showToast('✅ আইটেম মুছে ফেলা হয়েছে', 'success');
+  } catch(e) { showToast('❌ মুছতে সমস্যা'); }
+}
+
+window.saveFood = async function() {
+  const name = v('fName'); const category = v('fCategory'); const price = parseFloat(v('fPrice'));
+  if(!name||!category||isNaN(price)) { showToast('নাম, ক্যাটেগরি ও দাম দিন!'); return; }
+  let imgUrl = v('fImgUrl');
+  if(foodImgBase64 && _storage) {
+    try {
+      const r = _ref(_storage, 'foods/'+Date.now()+'.jpg');
+      await _uploadString(r, foodImgBase64, 'data_url');
+      imgUrl = await _getDownloadURL(r);
+    } catch(e) {}
+  }
+  const variants = [];
+  document.querySelectorAll('.vr-row').forEach(row=>{
+    const n=row.querySelector('.vr-name').value.trim();
+    const p=parseFloat(row.querySelector('.vr-price').value);
+    if(n&&!isNaN(p)) variants.push({name:n,price:p});
+  });
+  const data = {
+    name, category,
+    description: v('fDesc'), price,
+    discount: parseFloat(v('fDiscount'))||0,
+    tag: v('fTag'), image: imgUrl,
+    active: v('fActive')==='true',
+    variants, updatedAt: _serverTimestamp()
+  };
+  const docId = v('fId');
+  try {
+    if(docId) { await _updateDoc(_doc(_db,'foods',docId), data); const i=allFoods.findIndex(f=>f._id===docId); if(i>-1)allFoods[i]={...allFoods[i],...data}; }
+    else { const ref=await _addDoc(_col(_db,'foods'),{...data,createdAt:_serverTimestamp()}); allFoods.push({_id:ref.id,...data}); }
+    renderFoods(); updateDashboard();
+    document.getElementById('foodModalBg').classList.remove('open');
+    showToast('✅ আইটেম সেভ হয়েছে!', 'success');
+  } catch(e) { showToast('❌ সেভ করতে সমস্যা: '+e.message); }
+}
+
+window.handleFoodImg = function(input) {
+  const file = input.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => { foodImgBase64 = e.target.result; const p=document.getElementById('fImgPreview'); p.src=e.target.result; p.style.display='block'; };
+  reader.readAsDataURL(file);
+}
+window.previewImgUrl = function(url) { if(!url) return; const p=document.getElementById('fImgPreview'); p.src=url; p.style.display='block'; }
+window.addVariantRow = function(name='', price='') {
+  const div = document.createElement('div');
+  div.className = 'variant-row vr-row';
+  div.innerHTML = `<input class="form-input vr-name" placeholder="নাম (Small)" value="${name}"><input class="form-input vr-price" placeholder="দাম" type="number" value="${price}"><button type="button" class="variant-del-btn" onclick="this.parentNode.remove()">✕</button>`;
+  document.getElementById('variantsList').appendChild(div);
+}
+
+// ===== BANNERS =====
+async function loadBanners() {
+  try {
+    const snap = await _getDocs(_col(_db,'banners'));
+    allBanners = [];
+    snap.forEach(d => allBanners.push({_id:d.id,...d.data()}));
+    renderBanners();
+  } catch(e){}
+}
+
+function renderBanners() {
+  document.getElementById('bannersBody').innerHTML = !allBanners.length
+    ? '<tr><td colspan="5" class="empty-table">কোনো ব্যানার নেই</td></tr>'
+    : allBanners.map(b=>`
+      <tr>
+        <td><b>${b.title||'-'}</b></td>
+        <td>${b.badge||'-'}</td>
+        <td>${b.productLink?`<a href="${b.productLink}" target="_blank" style="color:var(--info);font-size:0.78rem;">লিংক দেখুন</a>`:'-'}</td>
+        <td><span style="display:inline-block;width:22px;height:22px;border-radius:4px;background:${b.bgColor||'#333'}"></span></td>
+        <td>
+          <button class="btn-icon" onclick="editBanner('${b._id}')">✏️</button>
+          <button class="btn-icon" onclick="deleteBanner('${b._id}')">🗑️</button>
+        </td>
+      </tr>`).join('');
+}
+
+window.openBannerModal = function(docId) {
+  bannerImgBase64 = null;
+  document.getElementById('bId').value = docId||'';
+  document.getElementById('bannerModalTitle').textContent = docId ? 'ব্যানার এডিট' : 'নতুন ব্যানার';
+  ['bTitle','bSubtitle','bBadge','bCta','bEmoji','bBgColor','bProductLink'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('bImgPreview').style.display='none';
+  document.getElementById('bannerModalBg').classList.add('open');
+}
+window.editBanner = function(docId) {
+  const b = allBanners.find(x=>x._id===docId); if(!b) return;
+  openBannerModal(docId);
+  setTimeout(()=>{
+    sv('bTitle',b.title); sv('bSubtitle',b.subtitle); sv('bBadge',b.badge);
+    sv('bCta',b.cta); sv('bEmoji',b.emoji); sv('bBgColor',b.bgColor);
+    sv('bProductLink',b.productLink||'');
+    if(b.image) { const p=document.getElementById('bImgPreview'); p.src=b.image; p.style.display='block'; }
+  },50);
+}
+window.deleteBanner = async function(docId) {
+  if(!confirm('এই ব্যানারটি মুছবেন?')) return;
+  try {
+    await _deleteDoc(_doc(_db,'banners',docId));
+    allBanners = allBanners.filter(b=>b._id!==docId); renderBanners();
+    showToast('✅ ব্যানার মুছে ফেলা হয়েছে', 'success');
+  } catch(e){}
+}
+window.saveBanner = async function() {
+  const title = v('bTitle'); if(!title) { showToast('টাইটেল দিন!'); return; }
+  let imgUrl = '';
+  if(bannerImgBase64 && _storage) {
+    try {
+      const r = _ref(_storage, 'banners/'+Date.now()+'.jpg');
+      await _uploadString(r, bannerImgBase64, 'data_url');
+      imgUrl = await _getDownloadURL(r);
+    } catch(e){}
+  }
+  const data = { title, subtitle:v('bSubtitle'), badge:v('bBadge'), cta:v('bCta'), emoji:v('bEmoji'), bgColor:v('bBgColor'), image:imgUrl, productLink:v('bProductLink') };
+  const docId = v('bId');
+  try {
+    if(docId) { await _updateDoc(_doc(_db,'banners',docId), data); const i=allBanners.findIndex(b=>b._id===docId); if(i>-1)allBanners[i]={...allBanners[i],...data}; }
+    else { const ref=await _addDoc(_col(_db,'banners'),data); allBanners.push({_id:ref.id,...data}); }
+    renderBanners();
+    document.getElementById('bannerModalBg').classList.remove('open');
+    showToast('✅ ব্যানার সেভ হয়েছে!', 'success');
+  } catch(e) { showToast('❌ সেভ করতে সমস্যা'); }
+}
+window.handleBannerImg = function(input) {
+  const file = input.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => { bannerImgBase64=e.target.result; const p=document.getElementById('bImgPreview'); p.src=e.target.result; p.style.display='block'; };
+  reader.readAsDataURL(file);
+}
+
+// ===== NOTICES =====
+async function loadNotices() {
+  try {
+    const snap = await _getDocs(_col(_db,'notices'));
+    allNotices = [];
+    snap.forEach(d => allNotices.push({_id:d.id,...d.data()}));
+    renderNotices();
+  } catch(e){}
+}
+
+function renderNotices() {
+  const el = document.getElementById('noticesList');
+  if(!allNotices.length) {
+    el.innerHTML = '<div style="text-align:center;padding:32px;color:#aaa;background:white;border-radius:12px;">কোনো নোটিশ নেই। নতুন নোটিশ যোগ করুন।</div>';
+    return;
+  }
+  el.innerHTML = allNotices.map(n=>`
+    <div class="notice-item-card">
+      <div class="notice-text">${n.text}</div>
+      <span class="notice-badge">${n.active!==false?'সক্রিয়':'নিষ্ক্রিয়'}</span>
+      <button class="btn-icon" onclick="editNotice('${n._id}')">✏️</button>
+      <button class="btn-icon" onclick="deleteNotice('${n._id}')">🗑️</button>
+    </div>`).join('');
+}
+
+window.openNoticeModal = function(docId) {
+  document.getElementById('noticeId').value = docId||'';
+  document.getElementById('noticeText').value = '';
+  document.getElementById('noticeActive').value = 'true';
+  document.getElementById('noticeModalBg').classList.add('open');
+}
+window.editNotice = function(docId) {
+  const n = allNotices.find(x=>x._id===docId); if(!n) return;
+  document.getElementById('noticeId').value = docId;
+  document.getElementById('noticeText').value = n.text||'';
+  document.getElementById('noticeActive').value = n.active!==false?'true':'false';
+  document.getElementById('noticeModalBg').classList.add('open');
+}
+window.deleteNotice = async function(docId) {
+  if(!confirm('এই নোটিশটি মুছবেন?')) return;
+  try {
+    await _deleteDoc(_doc(_db,'notices',docId));
+    allNotices = allNotices.filter(n=>n._id!==docId); renderNotices();
+    showToast('✅ নোটিশ মুছে ফেলা হয়েছে', 'success');
+  } catch(e) { showToast('❌ মুছতে সমস্যা'); }
+}
+window.saveNotice = async function() {
+  const text = document.getElementById('noticeText').value.trim();
+  if(!text) { showToast('নোটিশ টেক্সট দিন!'); return; }
+  const active = document.getElementById('noticeActive').value === 'true';
+  const data = { text, active, updatedAt: _serverTimestamp() };
+  const docId = document.getElementById('noticeId').value;
+  try {
+    if(docId) {
+      await _updateDoc(_doc(_db,'notices',docId), data);
+      const i = allNotices.findIndex(n=>n._id===docId);
+      if(i>-1) allNotices[i] = {...allNotices[i], ...data};
+    } else {
+      const ref = await _addDoc(_col(_db,'notices'), {...data, createdAt: _serverTimestamp()});
+      allNotices.push({_id:ref.id,...data});
+    }
+    renderNotices();
+    document.getElementById('noticeModalBg').classList.remove('open');
+    showToast('✅ নোটিশ সেভ হয়েছে!', 'success');
+  } catch(e) { showToast('❌ সেভ করতে সমস্যা'); }
+}
+
+// ===== LIVE CHAT =====
+function listenForNewChats() {
+  if(!window._onSnapshot) return;
+  const chatRef = _col(_db,'chats');
+  chatUnsubscribe = _onSnapshot(chatRef, snap => {
+    const unread = [];
+    snap.forEach(d => { const data = d.data(); if(!data.adminRead) unread.push({_id:d.id,...data}); });
+    const badge = document.getElementById('newChatBadge');
+    if(unread.length > 0) {
+      badge.classList.add('show');
+      badge.textContent = unread.length;
+      playAdminNotif();
+    } else {
+      badge.classList.remove('show');
+    }
+  });
+}
+
+function playAdminNotif() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    [0, 200].forEach(delay => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.frequency.value = 660;
+      gain.gain.setValueAtTime(0.5, ctx.currentTime + delay/1000);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay/1000 + 0.4);
+      osc.start(ctx.currentTime + delay/1000);
+      osc.stop(ctx.currentTime + delay/1000 + 0.4);
+    });
+  } catch(e) {}
+}
+
+window.loadChats = async function() {
+  document.getElementById('chatList').innerHTML = '<div class="tbl-loading"><div class="spinner"></div></div>';
+  try {
+    const snap = await _getDocs(_col(_db,'chats'));
+    const chats = [];
+    snap.forEach(d => chats.push({_id:d.id,...d.data()}));
+    chats.sort((a,b)=>(b.timestamp?.seconds||0)-(a.timestamp?.seconds||0));
+    // Group by session
+    const sessions = {};
+    chats.forEach(c => {
+      if(!sessions[c.sessionId]) sessions[c.sessionId] = [];
+      sessions[c.sessionId].push(c);
+    });
+    const sessionKeys = Object.keys(sessions);
+    if(!sessionKeys.length) {
+      document.getElementById('chatList').innerHTML = '<div style="text-align:center;padding:32px;color:#aaa;">কোনো চ্যাট নেই</div>';
+      return;
+    }
+    document.getElementById('chatList').innerHTML = sessionKeys.map(sid => {
+      const msgs = sessions[sid];
+      const hasUnread = msgs.some(m=>!m.adminRead);
+      const bubbles = msgs.map(m=>`
+        <div style="margin-bottom:6px;">
+          <div class="chat-bubble user-msg">${m.message}</div>
+          ${m.adminReply?`<div class="chat-bubble admin-msg" style="margin-top:4px;">👨‍🍳 ${m.adminReply}</div>`:''}
+        </div>`).join('');
+      const lastMsgId = msgs[0]._id;
+      return `<div class="chat-card">
+        <div class="chat-card-header">
+          <span class="chat-session-id">Session: ${sid.slice(0,20)}...</span>
+          ${hasUnread?`<span class="new-chat-badge">নতুন</span>`:''}
+        </div>
+        <div class="chat-card-body">
+          ${bubbles}
+          <div class="chat-reply-area">
+            <input class="chat-reply-input" id="reply_${lastMsgId}" placeholder="রিপ্লাই লিখুন...">
+            <button class="chat-reply-btn" onclick="sendAdminReply('${sid}','${lastMsgId}')">পাঠান ✈️</button>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e) { document.getElementById('chatList').innerHTML = '<div style="text-align:center;padding:32px;color:#aaa;">লোড সমস্যা</div>'; }
+}
+
+window.sendAdminReply = async function(sessionId, lastMsgId) {
+  const input = document.getElementById('reply_' + lastMsgId);
+  const reply = input.value.trim(); if(!reply) return;
+  try {
+    await _updateDoc(_doc(_db,'chats',lastMsgId), {
+      adminReply: reply,
+      adminRead: true,
+      userRead: false,
+      repliedAt: _serverTimestamp()
+    });
+    // Mark all in session as admin-read
+    input.value = '';
+    showToast('✅ রিপ্লাই পাঠানো হয়েছে!', 'success');
+    setTimeout(() => loadChats(), 500);
+  } catch(e) { showToast('❌ রিপ্লাই দিতে সমস্যা'); }
+}
+
+// ===== DASHBOARD =====
+function updateDashboard() {
+  document.getElementById('statTotal').textContent = allOrders.length;
+  document.getElementById('statPending').textContent = allOrders.filter(o=>o.status==='pending').length;
+  document.getElementById('statDelivered').textContent = allOrders.filter(o=>o.status==='delivered').length;
+  document.getElementById('statRevenue').textContent = '৳'+allOrders.filter(o=>o.status==='delivered').reduce((s,o)=>s+(o.total||0),0);
+  document.getElementById('statFoods').textContent = allFoods.length;
+}
+
+// ===== NAV =====
+const pageTitles = {dashboard:'ড্যাশবোর্ড',orders:'অর্ডার ম্যানেজমেন্ট',foods:'মেনু ম্যানেজমেন্ট',banners:'ব্যানার ম্যানেজমেন্ট',notices:'নোটিশ বোর্ড',chats:'লাইভ চ্যাট',settings:'সেটিংস'};
+window.showSection = function(name) {
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('sec'+name.charAt(0).toUpperCase()+name.slice(1)).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>{ if(n.textContent.trim().startsWith(pageTitles[name]?.slice(0,4)||name)) n.classList.add('active'); });
+  document.getElementById('pageTitle').textContent = pageTitles[name]||name;
+  document.getElementById('sidebar').classList.remove('open');
+  if(name==='chats') loadChats();
+}
+
+// ===== HELPERS =====
+window.closeModal = function(id, e) { if(!e||e.target.id===id) document.getElementById(id).classList.remove('open'); }
+function v(id) { return document.getElementById(id)?.value||''; }
+function sv(id, val) { const el=document.getElementById(id); if(el&&val!==undefined&&val!==null) el.value=val; }
+window.showToast = function(msg, type='') {
+  const t=document.getElementById('toast'); t.textContent=msg; t.className='toast show'+(type?' '+type:'');
+  setTimeout(()=>t.className='toast',3200);
+}
+</script>
+</body>
+</html>
